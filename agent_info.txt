@@ -1,0 +1,1 @@
+{"customer_id":"a192e275-d136-11e8-a3bf-000d3af26ae2","cluster_id":"c942bffe-d200-11e8-8e23-000d3af26ae2","role":"namenode","agent_id":"c942c003-d200-11e8-8e23-000d3af26ae2","agent_version":"1.0"}
