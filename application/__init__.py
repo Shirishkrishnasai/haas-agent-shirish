@@ -7,15 +7,14 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['Access-Control-Allow-Origin'] = '*'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/sbv1/arvind-sprint3/hadoop-as-service/agent/haas.db'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////opt/agent/haas'
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
 db = SQLAlchemy(app)
 
-engine = create_engine("sqlite:////home/sbv1/arvind-sprint3/hadoop-as-service/agent/haas.db")
+engine = create_engine("sqlite:////opt/agent/haas")
 session_factory = sessionmaker(bind=engine)
 sqlite_string= "/opt/agent/haas"
 from application.modules.workers.filebrowser import webhdfs
@@ -59,7 +58,7 @@ def site_map():
     print (links)
 
 
-
+agentregisterfunc()
 #print __name__,"Running..."
 def runProcess():
     """ add More processs here to run parallelly"""

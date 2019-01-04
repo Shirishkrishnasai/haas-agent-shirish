@@ -13,7 +13,11 @@ setup(
         'SQLAlchemy==1.2.0',
         'flask_sqlalchemy',
         'kafka==1.3.5',
-        'pymongo==3.7.1'
+        'pymongo==3.7.1',
+	'pyhive',
+	'thrift',
+	'sasl',
+	'thrift_sasl'
 
     ],
 

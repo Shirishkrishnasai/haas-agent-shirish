@@ -1,0 +1,4 @@
+application
+common
+config
+scripts

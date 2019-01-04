@@ -1,1 +1,1 @@
-{"customer_id":"a192e275-d136-11e8-a3bf-000d3af26ae2","cluster_id":"c942bffe-d200-11e8-8e23-000d3af26ae2","role":"namenode","agent_id":"c942c003-d200-11e8-8e23-000d3af26ae2","agent_version":"1.0"}
+{"customer_id":"b2f51215-0e88-11e9-bb3d-3ca9f49ab2cc","cluster_id":"c02c6724-0e89-11e9-bb3d-3ca9f49ab2cc","role":"hive","agent_id":"c7ca3772-0cf4-11e9-8adb-3ca9f49ab2cc","agent_version":"1.0"}
