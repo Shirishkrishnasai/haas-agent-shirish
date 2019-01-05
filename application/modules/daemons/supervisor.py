@@ -1,330 +1,129 @@
-from kafka import KafkaConsumer
-from apscheduler.schedulers.background import BackgroundScheduler
-from application import app,sqlite_string
-import sqlite3
 import os
+import json
+import sqlite3
 import datetime
 import subprocess
-from application.configfile import agentinfo_path,kafka_server_url
-
+from kafka import KafkaConsumer
+from application import sqlite_string, db
+from application.configfile import agentinfo_path, kafka_server_url
+from application.common.loggerfile import my_logger
+from application.models.models import TblAgentTaskStatus
+import sys
+import time
+from sqlalchemy.orm import scoped_session
+from application import session_factory
 
 def supervisoragent():
-    #try:
-        info = open(agentinfo_path, "r")
-        content = info.read()
-        data_req = json.loads(content, 'utf-8')
-        agent_id = str(data_req['agent_id'])
+    while True:
+        try:
+            my_logger.debug('in supervisor')
+            info = open(agentinfo_path, "r")
+            content = info.read()
+            data_req = json.loads(content, 'utf-8')
+            agent_id = str(data_req['agent_id'])
+            consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
+            consumer.subscribe(pattern='task*', )
+            try:
+                consumer.poll()
+                my_logger.debug("Polling consumer...")
+                for message in consumer:
+                    session = scoped_session(session_factory)
+                    consumer_data = message.value
+                    data = consumer_data.replace("'", '"')
+                    tasks_data = json.loads(data)
+                    if tasks_data['event_type'] == "tasks":
+                        if agent_id == tasks_data['agent_id']:
+                            my_logger.debug("agent_id verification done.....and this is true agent")
+                            task_id_dict = tasks_data['task_id']
+                            task_id = str(task_id_dict)
+                            path = tasks_data['worker_path']
+                            payloadid = tasks_data['payload_id']
 
-        consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url])
-
-        consumer.subscribe(pattern='task*',group_id=agent_id)
-
-        # Reading data from consumer and passing to the function
-
-        for message in consumer:
-
-            tasks_data = message.value
-            # print message
-            print 'hehehehehehehehehehehehe', tasks_data
-            #list1.append(customer_data)
-            #print list1,"list1"
-
-
-            connection_to_haas = sqlite3.connect(sqlite_string)
-            cur=connection_to_haas.cursor()
-            cur.execute("select uid_task_id from tbl_worker_assigned_task ")
-            worker_assigned_task_info=cur.fetchall()
-
-        # Assigning tasks when there are no assigned tasks upto date
-
-
-            if worker_assigned_task_info == []:
-                #cur.execute("select var_agent_worker_file_name,txt_path,uid_task_id,lng_task_type_id,txt_agent_worker_version,txt_payload_id from tbl_agent_worker_task_mapping")
-                #worker_tasks_info=cur.fetchall()
-
-                #for task_information in worker_tasks_info:
-                    #payloadid = task_information[5]
-                    payloadid = tasks_data['payload_id']
-            #Assigning to worker if worker has no arguments to be taken
-
-                    if payloadid == None:
-                        path = tasks_data['worker_path']
-                        #path=task_information[1]
-                        pathlist=path.split("/")
-                        pythonfile_name=pathlist[-1]
-                        extension_name = pythonfile_name.split(".")
-
-                #Assigning tasks if the worker is a python file
-
-
-                        if extension_name[1] == 'py':
-                            task_id = tasks_data['task_id']
-                            #task_id = task_information[2]
-                            py_path = "'" + "python" + " " + path + "'"
                             starttime = datetime.datetime.now()
-                            task_status_insert_statment = 'INSERT INTO tbl_agent_task_status (var_task_status,ts_execution_start_datetime,uid_task_id,bool_flag) VALUES ("running",' + '"' + str(starttime) + '"' + ',"' + str(task_id) + '","f"'+')'
-                            cur.execute(task_status_insert_statment)
-                            connection_to_haas.commit()
-                            execute = os.system(py_path)
+                            task_status_insert_data = TblAgentTaskStatus(var_task_status='running',
+                                                                         ts_execution_start_datetime=starttime,
+                                                                         uid_task_id=task_id,
+                                                                         bool_flag=0
+                                                                         )
 
-                    #Updates status if execution is completed
+                            session.add(task_status_insert_data)
+                            session.commit()
+                            my_logger.debug(
+                                "running status is updated in task status and bool flag is set to false as this is new entry")
 
+                            if payloadid == None:
+                                my_logger.debug("there is no payload id that is y this block is being executed now")
 
-                            if execute == 0:
-                                endtime = datetime.datetime.now()
-                                update_task_status = "UPDATE  tbl_agent_task_status SET var_task_status='completed',bool_flag='f',ts_finished_datetime=" + "'" + str(endtime) + "'" + " where uid_task_id='" + str(task_id)+"'"
-                                cur.execute(update_task_status)
-                                assigned_task_insert_statement="INSERT INTO tbl_worker_assigned_task (uid_task_id) VALUES ('"+str(task_id)+"')"
-                                cur.execute(assigned_task_insert_statement)
-                                connection_to_haas.commit()
-
-                #Assigning tasks if the worker is a shell script
-
-
-                        else:
-                            task_id = tasks_data['task_id']
-                            #task_id = task_information[2]
-                            sh_path = "sh" + " " + path
-                            starttime = datetime.datetime.now()
-                            task_status_insert_statment = 'INSERT INTO tbl_agent_task_status (var_task_status,ts_execution_start_datetime,uid_task_id,bool_flag) VALUES ("running",' + '"' + str(starttime) + '"' + ',"' + str(task_id) + '","f")'
-                            cur.execute(task_status_insert_statment)
-                            connection_to_haas.commit()
-
-                            execute = os.system(sh_path)
-
-
-                    #Updates status if execution is completed
-
-
-                            if execute == 0:
-                                endtime = datetime.datetime.now()
-                                update_task_status = "UPDATE  tbl_agent_task_status SET var_task_status='completed',bool_flag='f',ts_finished_datetime=" + "'" + str(endtime) + "'" + " where uid_task_id='" + str(task_id)+"'"
-                                cur.execute(update_task_status)
-                                assigned_task_insert_statement="INSERT INTO tbl_worker_assigned_task (uid_task_id) VALUES ('"+str(task_id)+"')"
-                                cur.execute(assigned_task_insert_statement)
-                                connection_to_haas.commit()
-
-            #Assigning to worker if worker has arguments to be taken
-
-
-                    else:
-                        task_type_id = tasks_data['task_type_id']
-                        #task_type_id=task_information[3]
-
-
-                        #worker_version=task_information[4]
-                        payloadid = tasks_data['payload_id']
-                        #payloadid=task_information[5]
-
-                        path =tasks_data['worker_path']
-                        #path=task_information[1]
-
-                        pathlist=path.split("/")
-                        pythonfile_name=pathlist[-1]
-                        name = pythonfile_name.split(".")
-                        py_path=[]
-
-                #Assigning tasks if the worker is a python file
-
-
-                        if name[1] == 'py':
-                            task_id = tasks_data['task_id']
-                            #task_id = task_information[2]
-
-                            py_path.append("python")
-                            py_path.append(path)
-                            py_path.append("payload_id")
-                            py_path.append(payloadid)
-                            starttime = datetime.datetime.now()
-                            task_status_insert_statment = "INSERT INTO tbl_agent_task_status (var_task_status,ts_execution_start_datetime,uid_task_id,bool_flag) VALUES ('running'," + "'" + str(starttime) + "'" + ",'" + str(task_id) + "','f')"
-                            cur.execute(task_status_insert_statment)
-                            connection_to_haas.commit()
-                            execute=subprocess.call(py_path, shell=False)
-                            #task_id = task_information[2]
-
-                    # Updates status if execution is completed
-                            if execute == 0:
-                                endtime = datetime.datetime.now()
-                                update_task_status = "UPDATE  tbl_agent_task_status SET var_task_status='completed',bool_flag='f',ts_finished_datetime=" + "'" + str(endtime) + "'" + " where uid_task_id='" + str(task_id)+"'"
-                                cur.execute(update_task_status)
-                                assigned_task_insert_statement="INSERT INTO tbl_worker_assigned_task (uid_task_id) VALUES ('"+str(task_id)+"')"
-                                cur.execute(assigned_task_insert_statement)
-                                connection_to_haas.commit()
-
-                # Assigning tasks if the worker is a shell script
-
-
-                        else:
-                            task_id = tasks_data['task_id']
-                            #task_id = task_information[2]
-
-                            sh_path = []
-                            sh_path.append(path)
-                            sh_path.append("payload_id")
-                            sh_path.append(payloadid)
-
-                            execute = subprocess.call(sh_path, shell=True)
-                            starttime = datetime.datetime.now()
-                            task_status_insert_statment = "INSERT INTO tbl_agent_task_status (var_task_status,ts_execution_start_datetime,uid_task_id,bool_flag) VALUES ('running'," + "'" + str(starttime) + "'" + ",'" + str(task_id) + "','f')"
-                            cur.execute(task_status_insert_statment)
-                            connection_to_haas.commit()
-
-                            #task_id = task_information[2]
-
-                    #Updates status if execution is completed
-
-
-                            if execute == 0:
-                                endtime = datetime.datetime.now()
-                                update_task_status = "UPDATE  tbl_agent_task_status SET var_task_status='completed',bool_flag='f',ts_finished_datetime=" + "'" + str(endtime) + "'" + " where uid_task_id='" + str(task_id)+"'"
-                                cur.execute( update_task_status)
-                                assigned_task_insert_statement="INSERT INTO tbl_worker_assigned_task (uid_task_id) VALUES ('"+str(task_id)+"')"
-                                cur.execute(assigned_task_insert_statement)
-                                connection_to_haas.commit()
-        #Assigning workers if there are aready assigned worker upto date
-            else:
-                agent_worker_tasks=[]
-                if len(worker_assigned_task_info) == 1:
-                    print(output[0][0])
-                    worker_tasks_info = "select var_agent_worker_file_name,txt_path,uid_task_id,lng_task_type_id,txt_agent_worker_version,txt_payload_id  from tbl_agent_worker_task_mapping where uid_task_id != '" + str(output[0][0])+"'"
-                    cur.execute(worker_tasks_info)
-                    worker_tasks_info = cur.fetchall()
-
-                else:
-                    for id in worker_assigned_task_info:
-                        agent_worker_tasks.append(id[0])
-                    tpl=tuple(agent_worker_tasks)
-                    print(tpl)
-                    worker_tasks_info="select var_agent_worker_file_name,txt_path,uid_task_id,lng_task_type_id,txt_agent_worker_version,txt_payload_id  from tbl_agent_worker_task_mapping where uid_task_id not in ('" +"','".join(tpl)+"')"
-                    cur.execute(worker_tasks_info)
-                    worker_tasks_info=cur.fetchall()
-                    for task_information in worker_tasks_info:
-                        payloadid = task_information[5]
-
-            # Assigning to worker if worker has no arguments to be taken
-
-
-                        if payloadid == None:
-                                file_name = task_information[0]
-                                path=task_information[1]
-                                task_type_id = task_information[3]
-                                worker_version = task_information[4]
-                                print(path)
-                                pathlist=path.split("/")
-                                pythonfile_name=pathlist[-1]
+                                pathlist = path.split("/")
+                                pythonfile_name = pathlist[-1]
                                 extension_name = pythonfile_name.split(".")
-                                task_id = task_information[2]
-
-                #Assigning tasks if the worker is a python file
-
 
                                 if extension_name[1] == 'py':
                                     py_path = "'" + "python" + " " + path + "'"
-                                    starttime = datetime.datetime.now()
-                                    task_status_insert_statment = "INSERT INTO tbl_agent_task_status (var_task_status,ts_execution_start_datetime,bool_flag='f',uid_task_id,bool_flag) VALUES ('running'," + "'" + str(starttime) + "'" + ",'" + str(task_id) + "','f')"
-                                    cur.execute(task_status_insert_statment)
-                                    connection_to_haas.commit()
+                                    my_logger.debug("this is python file")
+                                    my_logger.debug(py_path)
                                     execute = os.system(py_path)
-
-                        # Updates status if execution is completed
-
-
-                                    if execute == 0:
-                                        endtime = datetime.datetime.now()
-                                        update_task_status = "UPDATE  tbl_agent_task_status SET var_task_status='completed',bool_flag='f',ts_finished_datetime=" + "'" + str(endtime) + "'" + " where uid_task_id='" + str(task_id)+"'"
-                                        cur.execute(update_task_status)
-                                        assigned_task_insert_statement="INSERT INTO tbl_worker_assigned_task (uid_task_id) VALUES ('"+str(task_id)+"')"
-                                        cur.execute(assigned_task_insert_statement)
-                                        connection_to_haas.commit()
-
-                # Assigning tasks if the worker is a shell script
-
-
                                 else:
-                                    sh_path = "bash" + " " + path
-                                    starttime = datetime.datetime.now()
-                                    task_status_insert_statment = "INSERT INTO tbl_agent_task_status (var_task_status,ts_execution_start_datetime,uid_task_id,bool_flag) VALUES ('running'," + "'" + str(starttime) + "'" + ",'" + str(task_id) + "','f')"
-                                    cur.execute(task_status_insert_statment)
-                                    connection_to_haas.commit()
-                                    execute = subprocess.call(sh_path,shell=True)
-
-                        # Updates status if execution is completed
-
-
-                                    if execute == 0:
-                                        endtime = datetime.datetime.now()
-                                        update_task_status = "UPDATE  tbl_agent_task_status SET var_task_status='completed',bool_flag='f',ts_finished_datetime=" + "'" + str(endtime) + "'" + " where uid_task_id='" + str(task_id)+"'"
-                                        cur.execute(update_task_status)
-                                        assigned_task_insert_statement="INSERT INTO tbl_worker_assigned_task (uid_task_id) VALUES ('"+str(task_id)+"')"
-                                        cur.execute(assigned_task_insert_statement)
-                                        connection_to_haas.commit()
-
-            # Assigning to worker if worker has no arguments to be taken
-
-
-                        else:
-                            file_name = task_information[0]
-                            task_type_id = task_information[3]
-                            worker_version = task_information[4]
-                            payloadid = task_information[5]
-                            path=task_information[1]
-                            pathlist=path.split("/")
-                            pythonfile_name=pathlist[-1]
-                            extension_name = pythonfile_name.split(".")
-                            task_id = task_information[2]
-
-                #Assigning tasks if the worker is a python file
-
-
-                            if extension_name[1] == 'py':
-                                py_path = []
-                                py_path.append("python")
-                                py_path.append(path)
-                                py_path.append("payload_id")
-                                py_path.append(payloadid)
-                                starttime = datetime.datetime.now()
-                                task_status_insert_statment = "INSERT INTO tbl_agent_task_status (var_task_status,ts_execution_start_datetime,uid_task_id,bool_flag) VALUES ('running'," + "'" + str(starttime) + "'" + ",'" + str(task_id) + "','f')"
-                                cur.execute(task_status_insert_statment)
-                                connection_to_haas.commit()
-                                execute = subprocess.call(py_path, shell=False)
-
-                        # Updates status if execution is completed
-
-
+                                    sh_path = "sh" + " " + path
+                                    my_logger.debug("this is shell script")
+                                    my_logger.debug(sh_path)
+                                    execute = os.system(sh_path)
+                                    # Updates status if execution is completed
                                 if execute == 0:
+                                    my_logger.debug("execution success")
                                     endtime = datetime.datetime.now()
-                                    update_task_status = "UPDATE  tbl_agent_task_status SET var_task_status='completed',bool_flag='f',ts_finished_datetime=" + "'" + str(endtime) + "'" + " where uid_task_id='" + str(task_id)+"'"
-                                    cur.execute(update_task_status)
-                                    assigned_task_insert_statement="INSERT INTO tbl_worker_assigned_task (uid_task_id) VALUES ('"+str(task_id)+"')"
-                                    cur.execute(assigned_task_insert_statement)
-                                    connection_to_haas.commit()
-
-                # Assigning tasks if the worker is a shell script
-
+                                    update_task_status_query = session.query(TblAgentTaskStatus).filter(
+                                        TblAgentTaskStatus.uid_task_id == task_id)
+                                    update_task_status_query.update({"var_task_status": "completed",
+                                                                     "bool_flag": 0,
+                                                                     "ts_finished_datetime": endtime})
+                                    session.commit()
+                                    my_logger.debug("completed status inserted into database")
+                            # Assigning to worker if worker has arguments to be taken
 
                             else:
-                                sh_path = []
-                                sh_path.append(path)
 
-                                starttime = datetime.datetime.now()
-                                task_status_insert_statment = "INSERT INTO tbl_agent_task_status (var_task_status,ts_execution_start_datetime,uid_task_id,bool_flag) VALUES ('running'," + "'" + str(starttime) + "'" + ",'" + str(task_id) + "','f')"
-                                cur.execute(task_status_insert_statment)
-                                connection_to_haas.commit()
-                                execute = subprocess.call(sh_path, shell=True)
+                                my_logger.debug("there is payload id that is y this block is being executed")
+                                pathlist = path.split("/")
+                                pythonfile_name = pathlist[-1]
+                                name = pythonfile_name.split(".")
+                                py_path = []
+                                if name[1] == 'py':
 
-                        # Updates status if execution is completed
-
-
+                                    py_path.append("python")
+                                    py_path.append(path)
+                                    py_path.append("payload_id")
+                                    py_path.append(payloadid)
+                                    my_logger.debug("this is python file")
+                                    my_logger.debug(py_path)
+                                    execute = subprocess.call(py_path, shell=False)
+                                    my_logger.debug(execute)
+                                    my_logger.debug("that is execuute output for python file")
+                                else:
+                                    sh_path = []
+                                    sh_path.append(path)
+                                    sh_path.append("payload_id")
+                                    sh_path.append(payloadid)
+                                    my_logger.debug(sh_path)
+                                    execute = subprocess.call(sh_path, shell=True)
                                 if execute == 0:
                                     endtime = datetime.datetime.now()
-                                    update_task_status = "UPDATE  tbl_agent_task_status SET var_task_status='completed',bool_flag='f',ts_finished_datetime=" + "'" + str(endtime) + "'" + " where uid_task_id='" + str(task_id)+"'"
-                                    cur.execute(update_task_status)
-                                    assigned_task_insert_statement="INSERT INTO tbl_worker_assigned_task (uid_task_id) VALUES ('"+str(task_id)+"')"
-                                    cur.execute(assigned_task_insert_statement)
-                                    connection_to_haas.commit()
 
-        # Sceduler job for supervisor code for ever one minute
-def agentsupervisorscheduler():
-                scheduler = BackgroundScheduler()
-                scheduler.add_job(supervisoragent,'cron',minute='*/1' )
-                scheduler.start()
+                                    update_task_status_query = session.query(TblAgentTaskStatus).filter_by(
+                                        uid_task_id=str(task_id))
+                                    update_task_status_query.update({"var_task_status": "completed",
+                                                                     "bool_flag": 0,
+                                                                     "ts_finished_datetime": endtime})
+                                    session.commit()
+                                    my_logger.debug("last statement in supervisor...updation done")
+                    session.close()
+            except Exception as e:
+                my_logger.debug("Erro Occured ad supervusir, at 125")
+                my_logger.debug(sys.exc_info()[0])
+                my_logger.error(e.message)
+        except Exception as e:
+            my_logger.debug(sys.exc_info()[0])
+            my_logger.error(e.message)
+        finally:
+            consumer.close()
+    time.sleep(10)
