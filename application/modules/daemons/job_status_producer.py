@@ -3,7 +3,7 @@ from application import session_factory
 from application.models.models import TblMrJobInfo
 import subprocess
 
-from application.config.configfile import kafka_bootstrap_server, kafka_api_version
+from application.configfile import kafka_bootstrap_server, kafka_api_version
 import re
 import json
 from kafka import KafkaProducer
