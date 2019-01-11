@@ -25,8 +25,8 @@ from application.modules.daemons.metrics_producer import kafkaMetricsProducerSch
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
 from application.modules.daemons.metrics_producer import kafkaMetricsProducerScheduler
-from application.modules.daemons.hive_result_query_worker import hiveSelectQueryResult
-from application.modules.daemons.supervisor_sprint2 import supervisoragent
+#from application.modules.daemons.hive_result_query_worker import hiveSelectQueryResult
+#from application.modules.daemons.supervisor_sprint2 import supervisoragent
 from application.modules.daemons.hive_query_consumer import hiveQueryConsumer
 from application.modules.daemons.hive_status_producer import hiveStatusScheduler
 
@@ -38,7 +38,7 @@ hivyc = hive_connection
 from application.modules.daemons.job_diagnostics_producer import jobdiagnostics
 from application.modules.daemons.job_status_producer import jobstatus
 from application.modules.daemons.job_insertion import insertjob
-from application.modules.workers.file_upload_to_hdfs import fileuploadhdfs
+#from application.modules.workers.file_upload_to_hdfs import fileuploadhdfs
 from multiprocessing import Process
 
 def has_no_empty_params(rule):
