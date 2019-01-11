@@ -24,6 +24,7 @@ def agentregisterfunc():
 		headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 		requests.post(url,data=data,headers=headers)
 		print 'done'
+
 		azure_credential_url = server_url + azure_credentials_url + customer_id
 		get_azure_credetials = requests.get(azure_credential_url)
 		print get_azure_credetials,'gettttttttttttt'
@@ -35,7 +36,7 @@ def agentregisterfunc():
 		print azure_share_name,'shareeee'
 		# Script details
 		script_path = "/opt/scripts"
-		script_name = 'azuremountshare.sh'
+		script_name = 'azure-mount-share.sh'
 		script_arguments = azure_account_name + ' ' + azure_account_key + ' ' + azure_share_name
 		execute_statement = "bash" +' '+ script_path+'/'+ script_name + ' '+ script_arguments
 		#execute_statement = 'dir'
