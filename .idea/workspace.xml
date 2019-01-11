@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="18f8d721-b75f-4f6e-90d1-03cc0c2b55ac" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/application/__init__.py" afterPath="$PROJECT_DIR$/application/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/application/modules/daemons/ag_dm_registration.py" afterPath="$PROJECT_DIR$/application/modules/daemons/ag_dm_registration.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -33,8 +32,8 @@
       <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/application/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="76" column="5" lean-forward="false" selection-start-line="76" selection-start-column="5" selection-end-line="76" selection-end-column="5" />
+            <state relative-caret-position="457">
+              <caret line="85" column="39" lean-forward="false" selection-start-line="65" selection-start-column="4" selection-end-line="85" selection-end-column="39" />
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
               </folding>
@@ -74,8 +73,8 @@
         <option value="$PROJECT_DIR$/application/modules/daemons/job_diagnostics_producer.py" />
         <option value="$PROJECT_DIR$/application/modules/daemons/job_status_producer.py" />
         <option value="$PROJECT_DIR$/application/configfile.py" />
-        <option value="$PROJECT_DIR$/application/__init__.py" />
         <option value="$PROJECT_DIR$/application/modules/daemons/ag_dm_registration.py" />
+        <option value="$PROJECT_DIR$/application/__init__.py" />
       </list>
     </option>
   </component>
@@ -280,21 +279,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/application/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="457">
+          <caret line="85" column="39" lean-forward="false" selection-start-line="65" selection-start-column="4" selection-end-line="85" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/application/configfile.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
           <caret line="7" column="25" lean-forward="false" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/application/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="76" column="5" lean-forward="false" selection-start-line="76" selection-start-column="5" selection-end-line="76" selection-end-column="5" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
