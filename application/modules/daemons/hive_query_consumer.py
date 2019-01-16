@@ -1,4 +1,4 @@
-import os
+import os,sys
 import csv
 import json
 import time
@@ -28,7 +28,7 @@ def hiveQueryConsumer():
 
     while True:
         try:
-            my_logger.debug('in hive query consumer')
+            my_logger.info('in hive query consumer')
             info = open(agentinfo_path, "r")
             content = info.read()
             data_req = json.loads(content, 'utf-8')
@@ -39,61 +39,72 @@ def hiveQueryConsumer():
             consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
             consumer.subscribe(pattern='hivequery*')
             try:
-                consumer.poll()
-                my_logger.debug("Polling consumer...")
-                for message in consumer:
-                    db_session = scoped_session(session_factory)
-                    consumer_data = message.value
-                    #print "..........................",consumer_data
-                    data = consumer_data.replace("'", '"')
-                    query_data = json.loads(data)
-                    #print 'hellllllllllloooooooooooooooooo'
-                    print query_data
-                    if agent_id == query_data['agent_id']:
-                        my_logger.debug("agent_id verification done.....and this is true agent")
-                        hive_query = query_data['query_string']
-                        query_database = query_data['database']
-                        output_type = query_data['output_type']
-                        hive_request_id = query_data['hive_request_id']
+                message = consumer.poll(timeout_ms=1000, max_records=1)
+                if message != {}:
+                    topicMesages = message.values()
+
+                    for messageValues in topicMesages[0]:
+                        db_session = scoped_session(session_factory)
+                        consumer_data = messageValues.value
+                        #print "..........................",consumer_data
+                        data = consumer_data.replace("'", '"')
+                        query_data = json.loads(data)
+                        #print 'hellllllllllloooooooooooooooooo'
+                        print query_data
+                        if agent_id == query_data['agent_id']:
+                            my_logger.info("agent_id verification done.....and this is true agent")
+                            hive_query = query_data['query_string']
+                            query_database = query_data['database']
+                            output_type = query_data['output_type']
+                            hive_request_id = query_data['hive_request_id']
 
 
-                        #if query_data['output_type'] == 'url' or query_data['output_type'] == 'select':
-                        if query_data['output_type'] == 'url':
+                            #if query_data['output_type'] == 'url' or query_data['output_type'] == 'select':
+                            if query_data['output_type'] == 'url':
 
-                            explain_query = query_data['explain']
-                            select_query_process = multiprocessing.Process(target=hiveSelectQueryWorker,
-                                                                           args=([output_type, query_database, explain_query, hive_query, hive_request_id, customer_id,cluster_id, ]))
-                            select_query_process.start()
-                            my_logger.info("select query running..........so takes time..........please be patient")
-                            select_query_process.join()
-                            my_logger.info("select query process done........")
+                                explain_query = query_data['explain']
+                                select_query_process = multiprocessing.Process(target=hiveSelectQueryWorker,
+                                                                               args=([output_type, query_database, explain_query, hive_query, hive_request_id, customer_id,cluster_id, ]))
+                                select_query_process.start()
+                                my_logger.info("select query running..........so takes time..........please be patient")
+                                select_query_process.join()
+                                my_logger.info("select query process done........")
 
-                        elif query_data['output_type'] == 'tuples':
-                            result_query_process = multiprocessing.Process(target=hiveResultQueryWorker,
-                                                                           args=([query_database, hive_query, hive_request_id, customer_id,cluster_id, ]))
-                            result_query_process.start()
-                            my_logger.info("its a query that has result..........please be patient")
-                            result_query_process.join()
-                            my_logger.info("hive result query process done........")
-                            #column_names = query_result['description'][0][0]
-                            #row_list = query_result['output']
+                            elif query_data['output_type'] == 'tuples':
+                                result_query_process = multiprocessing.Process(target=hiveResultQueryWorker,
+                                                                               args=([query_database, hive_query, hive_request_id, customer_id,cluster_id, ]))
+                                result_query_process.start()
+                                my_logger.info("its a query that has result..........please be patient")
+                                result_query_process.join()
+                                my_logger.info("hive result query process done........")
+                                #column_names = query_result['description'][0][0]
+                                #row_list = query_result['output']
+
+                            else:
+                                noresult_query_process = multiprocessing.Process(target=hiveNoResultQueryWorker,
+                                                                               args=([query_database, hive_query, hive_request_id, customer_id,cluster_id, ]))
+                                noresult_query_process.start()
+                                my_logger.info("no result for this query...probably a ddl query..........please be patient")
+                                noresult_query_process.join()
+                                my_logger.info("ddl query process done........")
+                            consumer.commit()
+                            print 'ok'
+                            db_session.close()
 
                         else:
-                            noresult_query_process = multiprocessing.Process(target=hiveNoResultQueryWorker,
-                                                                           args=([query_database, hive_query, hive_request_id, customer_id,cluster_id, ]))
-                            noresult_query_process.start()
-                            my_logger.info("no result for this query...probably a ddl query..........please be patient")
-                            noresult_query_process.join()
-                            my_logger.info("ddl query process done........")
-                        consumer.commit()
-                        print 'ok'
-                        db_session.close()
-
-                    else:
-                        my_logger.info("agent id is incorrect")
+                            my_logger.info("agent id is incorrect")
 
             except Exception as e:
-                print e
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                my_logger.error(exc_type)
+                my_logger.error(fname)
+                my_logger.error(exc_tb.tb_lineno)
 
         except Exception as e:
-            print e
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            my_logger.error(exc_type)
+            my_logger.error(fname)
+            my_logger.error(exc_tb.tb_lineno)
+
