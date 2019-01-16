@@ -63,27 +63,27 @@ agentregisterfunc()
 def runProcess():
     """ add More processs here to run parallelly"""
 
-    filebrowsing_process=Process(target=webhdfs)
-    filebrowsing_process.start()
-    kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
-    kafkaMetricsProducerScheduler_Process.start()
-    supervisoragent_Process=Process(target=supervisoragent)
-    supervisoragent_Process.start()
-    agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
-    agentmonitorscheduler_Process.start()
+    #filebrowsing_process=Process(target=webhdfs)
+    #filebrowsing_process.start()
+    #kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
+    #kafkaMetricsProducerScheduler_Process.start()
+    #supervisoragent_Process=Process(target=supervisoragent)
+    #supervisoragent_Process.start()
+    #agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
+    #agentmonitorscheduler_Process.start()
 
     hiveQueryConsumer_Process = Process(target=hiveQueryConsumer)
     hiveQueryConsumer_Process.start()
 
-    job_diagnostics_producer_Process = Process(target=jobdiagnostics)
-    job_diagnostics_producer_Process.start()
-    job_status_producer_Process = Process(target=jobstatus)
-    job_status_producer_Process.start()
+    #job_diagnostics_producer_Process = Process(target=jobdiagnostics)
+    #job_diagnostics_producer_Process.start()
+    #job_status_producer_Process = Process(target=jobstatus)
+    #job_status_producer_Process.start()
 
     hiveDatabaseQueryConsumer_Process = Process(target=hiveDatabaseQueryConsumer)
     hiveDatabaseQueryConsumer_Process.start()
-    hiveStatusScheduler_Process = Process(target=hiveStatusScheduler)
-    hiveStatusScheduler_Process.start()
+    #hiveStatusScheduler_Process = Process(target=hiveStatusScheduler)
+    #hiveStatusScheduler_Process.start()
     print "running Processs....",__name__,"running process"
 #if __name__ == "application":
     #print "running process again",__name__
