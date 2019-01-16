@@ -19,7 +19,7 @@ def supervisoragent():
             data_req = json.loads(content, 'utf-8')
             agent_id = str(data_req['agent_id'])
             consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
-            consumer.subscribe(pattern='task*', )
+            consumer.subscribe(pattern='task*')
             try:
                 message = consumer.poll(timeout_ms=1000, max_records=1)
                 if message != {}:
