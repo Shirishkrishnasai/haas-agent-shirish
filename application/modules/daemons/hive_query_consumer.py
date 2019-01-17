@@ -35,7 +35,7 @@ def hiveQueryConsumer():
             agent_id = str(data_req['agent_id'])
             customer_id = str(data_req['customer_id'])
             cluster_id = str(data_req['cluster_id'])
-
+            print "Connecting to ",kafka_server_url
             consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
             consumer.subscribe(pattern='hivequery*')
             try:
@@ -107,4 +107,4 @@ def hiveQueryConsumer():
             my_logger.error(exc_type)
             my_logger.error(fname)
             my_logger.error(exc_tb.tb_lineno)
-
+        time.sleep(10)

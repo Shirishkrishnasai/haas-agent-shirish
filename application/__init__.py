@@ -26,7 +26,7 @@ from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
 from application.modules.daemons.metrics_producer import kafkaMetricsProducerScheduler
 #from application.modules.daemons.hive_result_query_worker import hiveSelectQueryResult
-#from application.modules.daemons.supervisor_sprint2 import supervisoragent
+from application.modules.daemons.supervisor import supervisoragent
 from application.modules.daemons.hive_query_consumer import hiveQueryConsumer
 from application.modules.daemons.hive_status_producer import hiveStatusScheduler
 
@@ -65,12 +65,12 @@ def runProcess():
 
     #filebrowsing_process=Process(target=webhdfs)
     #filebrowsing_process.start()
-    #kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
-    #kafkaMetricsProducerScheduler_Process.start()
-    #supervisoragent_Process=Process(target=supervisoragent)
-    #supervisoragent_Process.start()
-    #agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
-    #agentmonitorscheduler_Process.start()
+    kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
+    kafkaMetricsProducerScheduler_Process.start()
+    supervisoragent_Process=Process(target=supervisoragent)
+    supervisoragent_Process.start()
+    agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
+    agentmonitorscheduler_Process.start()
 
     hiveQueryConsumer_Process = Process(target=hiveQueryConsumer)
     hiveQueryConsumer_Process.start()
