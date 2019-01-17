@@ -13,15 +13,10 @@ from application.modules.workers.hive_result_query_worker import hiveResultQuery
 from application.modules.workers.hive_selectquery_worker import hiveSelectQueryWorker
 from kafka import KafkaConsumer
 from sqlalchemy.orm import scoped_session
-
+from application.common.load_config import loadconfig
 
 def hiveQueryConsumer():
-    info = open(agentinfo_path, "r")
-    content = info.read()
-    data_req = json.loads(content, 'utf-8')
-    agent_id = str(data_req['agent_id'])
-    customer_id = str(data_req['customer_id'])
-    cluster_id = str(data_req['cluster_id'])
+    agent_id,customer_id,cluster_id = loadconfig()
     print "Connecting to ", kafka_server_url
     consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
     consumer.subscribe(pattern='hivequery*')

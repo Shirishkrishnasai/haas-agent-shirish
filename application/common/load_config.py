@@ -10,7 +10,9 @@ def loadconfig():
         content = info.read()
         data_req = json.loads(content, 'utf-8')
         agent_id = str(data_req['agent_id'])
-        return agent_id
+        customer_id = str(data_req['customer_id'])
+        cluster_id = str(data_req['cluster_id'])
+        return agent_id,customer_id,cluster_id
     except Exception as e:
-        my_logger.erro("Sometehing went worng while parsing agentinfo file...")
-        return None
+        my_logger.error("Sometehing went worng while parsing agentinfo file...")
+        return None,None,None

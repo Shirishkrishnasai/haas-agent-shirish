@@ -7,16 +7,12 @@ from application.common.loggerfile import my_logger
 from application.configfile import agentinfo_path, kafka_server_url, hive_connection
 from kafka import KafkaConsumer
 from kafka import KafkaProducer
+from application.common.load_config import loadconfig
 import time
 
 def hiveDatabaseQueryConsumer():
     my_logger.debug('in hive query consumer')
-    info = open(agentinfo_path, "r")
-    content = info.read()
-    data_req = json.loads(content, 'utf-8')
-    agent_id = str(data_req['agent_id'])
-    customer_id = str(data_req['customer_id'])
-    cluster_id = str(data_req['cluster_id'])
+    agent_id, customer_id, cluster_id = loadconfig()
     consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
     consumer.subscribe(pattern='hivedatabasequery*')
     while True:

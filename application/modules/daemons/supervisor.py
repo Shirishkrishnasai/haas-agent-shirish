@@ -16,7 +16,7 @@ from sqlalchemy.orm import scoped_session
 
 def _supervisoragent():
     my_logger.debug('in supervisor')
-    agent_id = loadconfig()
+    agent_id, customer_id, cluster_id = loadconfig()
 
     consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
     consumer.subscribe(pattern='task*')
@@ -132,5 +132,10 @@ def supervisoragent():
     try:
         _supervisoragent()
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
         my_logger.info("Calling itself.. supervisorAgent")
-        supervisoragent()
+    # supervisoragent()
