@@ -24,26 +24,29 @@ from application.modules.workers.hive_noresult_query_worker import hiveNoResultQ
 
 
 
-def hiveQueryConsumer():
+def _hiveQueryConsumer():
+    my_logger.info('in hive query consumer')
+    info = open(agentinfo_path, "r")
+    content = info.read()
+    data_req = json.loads(content, 'utf-8')
+    agent_id = str(data_req['agent_id'])
+    customer_id = str(data_req['customer_id'])
+    cluster_id = str(data_req['cluster_id'])
+    print "Connecting to ", kafka_server_url
+    consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
+    consumer.subscribe(pattern='hivequery*')
+
 
     while True:
         try:
-            my_logger.info('in hive query consumer')
-            info = open(agentinfo_path, "r")
-            content = info.read()
-            data_req = json.loads(content, 'utf-8')
-            agent_id = str(data_req['agent_id'])
-            customer_id = str(data_req['customer_id'])
-            cluster_id = str(data_req['cluster_id'])
-            print "Connecting to ",kafka_server_url
-            consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
-            consumer.subscribe(pattern='hivequery*')
-            try:
-                message = consumer.poll(timeout_ms=1000, max_records=1)
-                if message != {}:
-                    topicMesages = message.values()
 
-                    for messageValues in topicMesages[0]:
+            message = consumer.poll(timeout_ms=1000, max_records=1)
+            if message != {}:
+                topicMesages = message.values()
+
+                for messageValues in topicMesages[0]:
+                    try:
+
                         db_session = scoped_session(session_factory)
                         consumer_data = messageValues.value
                         #print "..........................",consumer_data
@@ -93,13 +96,15 @@ def hiveQueryConsumer():
 
                         else:
                             my_logger.info("agent id is incorrect")
+                    except Exception as e :
+                        exc_type, exc_obj, exc_tb = sys.exc_info()
+                        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                        my_logger.error(exc_type)
+                        my_logger.error(fname)
+                        my_logger.error(exc_tb.tb_lineno)
 
-            except Exception as e:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                my_logger.error(exc_type)
-                my_logger.error(fname)
-                my_logger.error(exc_tb.tb_lineno)
+            else:
+                my_logger.info("hive query consumer received no messages")
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -107,4 +112,11 @@ def hiveQueryConsumer():
             my_logger.error(exc_type)
             my_logger.error(fname)
             my_logger.error(exc_tb.tb_lineno)
-        time.sleep(10)
+        time.sleep(5)
+
+def hiveQueryConsumer():
+    try:
+        _hiveQueryConsumer()
+    except Exception as e:
+        my_logger.info("CAlling itself..,kafkataskconsumer")
+        hiveQueryConsumer()
