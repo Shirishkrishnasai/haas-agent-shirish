@@ -18,7 +18,7 @@ from application.common.load_config import loadconfig
 def hiveQueryConsumer():
     agent_id,customer_id,cluster_id = loadconfig()
     print "Connecting to ", kafka_server_url
-    consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
+    consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id="hive_query"+str(agent_id))
     consumer.subscribe(pattern='hivequery*')
     while True:
         try:
