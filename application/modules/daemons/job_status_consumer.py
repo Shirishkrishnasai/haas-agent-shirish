@@ -4,12 +4,13 @@ from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblCustomerJobRequest,TblMetaMrRequestStatus
 import json
+from datetime import datetime
 
 def statusconsumer():
     try:
         session = scoped_session(session_factory)
 
-        consumer = KafkaConsumer(bootstrap_servers=kafka_bootstrap_server)
+        consumer = KafkaConsumer(bootstrap_servers=kafka_bootstrap_server,group_id="job_Status"+str(datetime.now))
         consumer.subscribe(pattern='job_status*')
         for message in consumer:
             job_data = message.value

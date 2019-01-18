@@ -13,7 +13,7 @@ import time
 def hiveDatabaseQueryConsumer():
     my_logger.debug('in hive query consumer')
     agent_id, customer_id, cluster_id = loadconfig()
-    consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
+    consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id="hivedatabasequery"+str(agent_id))
     consumer.subscribe(pattern='hivedatabasequery*')
     while True:
         try:

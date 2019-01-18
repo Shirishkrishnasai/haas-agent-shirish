@@ -15,11 +15,11 @@ from sqlalchemy.orm import scoped_session
 
 
 def _supervisoragent():
-    my_logger.debug('in supervisor')
+    my_logger.info('in supervisor')
     #calling function for agent info details
     agent_id, customer_id, cluster_id = loadconfig()
 
-    consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
+    consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id="task_consumer"+str(agent_id))
     consumer.subscribe(pattern='task*')
     while True:
         try:
@@ -28,6 +28,7 @@ def _supervisoragent():
             if message != {}:
 
                 topicMesages = message.values()
+                consumer.commit()
                 for messageValues in topicMesages[0]:
                     session = scoped_session(session_factory)
                     consumer_data = messageValues.value
@@ -120,6 +121,7 @@ def _supervisoragent():
                                     session.commit()
                                     my_logger.info("last statement in supervisor...updation done")
                     session.close()
+
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
