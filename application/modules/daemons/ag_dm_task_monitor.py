@@ -32,21 +32,21 @@ def agentmonitordaemon():
             select_task_status = "select uid_task_id,var_task_status,bool_flag from tbl_agent_task_status"
             cur.execute(select_task_status)
             tasks = cur.fetchall()
-            my_logger.debug(tasks)
-            my_logger.debug("agent task status daemon fetched tasks")
+            my_logger.info(tasks)
+            my_logger.info("agent task status daemon fetched tasks")
             for each_task in tasks:
-                my_logger.debug("in for loop")
-                my_logger.debug(each_task)
+                my_logger.info("in for loop")
+                my_logger.info(each_task)
                 task_data = {}
                 if each_task[2] == 0:
-                    my_logger.debug("checked for bool_flag=0 in db")
+                    my_logger.info("checked for bool_flag=0 in db")
                     task_data['task_id'] = each_task[0]
                     task_data['status'] = each_task[1]
                     kafka_topic = "taskstatus_" + customer_id + "_" + cluster_id
-                    my_logger.debug(kafka_topic)
+                    my_logger.info(kafka_topic)
                     kafkatopic = kafka_topic.decode('utf-8')
-                    my_logger.debug("this is kafkaaaaaaaaaaaa topic for status")
-                    my_logger.debug(kafkatopic)
+                    my_logger.info("this is kafkaaaaaaaaaaaa topic for status")
+                    my_logger.info(kafkatopic)
                     task_status_data = {}
                     task_status_data['event_type'] = "task_status"
                     date_time = datetime.datetime.now()
@@ -62,13 +62,13 @@ def agentmonitordaemon():
                     payload_data['message'] = "incomplete for now"
 
                     task_status_data['payload'] = payload_data
-                    my_logger.debug("print all the data that has to be given from kafka status producer")
-                    my_logger.debug(task_status_data)
+                    my_logger.info("print all the data that has to be given from kafka status producer")
+                    my_logger.info(task_status_data)
 
                     producer.send(kafkatopic, str(task_status_data))
                     producer.flush()
-                    my_logger.debug("doneeeeeeee-doneeeeeeeeeeee-londonnnnnnnnnnnnn")
-                    my_logger.debug("done for agent task monitor daemon to send task status data through kafka pipeline")
+                    my_logger.info("doneeeeeeee-doneeeeeeeeeeee-londonnnnnnnnnnnnn")
+                    my_logger.info("done for agent task monitor daemon to send task status data through kafka pipeline")
                     # url=server_url+hgmonitor_connection
                     # headers={'content-type':'application/json','Accept':'text/plain'}
                     # requests.post(url,data=json.dumps(task_data),headers=headers)
@@ -77,17 +77,17 @@ def agentmonitordaemon():
                     update_task_flag_query.update({"bool_flag": 1})
                     db.session.commit()
 
-                my_logger.debug("everything doneeeeeeeeeeeeeeeeeeeeeeeeeee")
+                my_logger.info("everything doneeeeeeeeeeeeeeeeeeeeeeeeeee")
             print 'task update to hgmonitor successfull'
             producer.close()
         except sqlite3.Error as er:
-            my_logger.debug(er)
-            my_logger.debug(sys.exc_info()[0])
+            my_logger.info(er)
+            my_logger.info(sys.exc_info()[0])
             #return 'sqlite error'
         except Exception as e:
             print  "Some this went wrong", sys.exc_info()[0]
-            my_logger.debug(e)
-            my_logger.debug(sys.exc_info()[0])
+            my_logger.info(e)
+            my_logger.info(sys.exc_info()[0])
             #return e.message
         #producer.close()
         time.sleep(20)
