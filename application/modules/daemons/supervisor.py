@@ -16,6 +16,7 @@ from sqlalchemy.orm import scoped_session
 
 def _supervisoragent():
     my_logger.debug('in supervisor')
+    #calling function for agent info details
     agent_id, customer_id, cluster_id = loadconfig()
 
     consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
