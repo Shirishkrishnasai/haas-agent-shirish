@@ -19,4 +19,3 @@ mail_handler.setFormatter(logging.Formatter(
 
 my_logger = app.logger
 
-my_logger.basicConfig(level=logging.INFO)
