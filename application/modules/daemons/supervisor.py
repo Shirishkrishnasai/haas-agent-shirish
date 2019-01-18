@@ -23,8 +23,10 @@ def _supervisoragent():
     consumer.subscribe(pattern='task*')
     while True:
         try:
+            my_logger.info("Polling consumer")
             message = consumer.poll(timeout_ms=1000, max_records=1)
             if message != {}:
+
                 topicMesages = message.values()
                 for messageValues in topicMesages[0]:
                     session = scoped_session(session_factory)
@@ -125,13 +127,15 @@ def _supervisoragent():
             my_logger.error(fname)
             my_logger.error(exc_tb.tb_lineno)
         finally:
-            consumer.close()
+            pass
         time.sleep(10)
 
 
 def supervisoragent():
     try:
+        my_logger.info("Calling.. supervisor agent")
         _supervisoragent()
+        my_logger.info("Completed.. supervisor agent")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -139,4 +143,4 @@ def supervisoragent():
         my_logger.error(fname)
         my_logger.error(exc_tb.tb_lineno)
         my_logger.info("Calling itself.. supervisorAgent")
-    # supervisoragent()
+        supervisoragent()
