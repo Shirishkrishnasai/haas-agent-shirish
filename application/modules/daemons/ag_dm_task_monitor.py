@@ -1,18 +1,18 @@
 import datetime
-import time
-import requests
 import json
-from kafka import KafkaProducer
 import logging
 import sys
+import time
+
+from kafka import KafkaProducer
+
 logging.basicConfig()
 import sqlite3
-from apscheduler.schedulers.background import BackgroundScheduler
 from application import sqlite_string, db
-from application.configfile import kafka_server_url, agentinfo_path, server_url, hgmonitor_connection
+from application.configfile import kafka_server_url, agentinfo_path
 from application.common.loggerfile import my_logger
 from application.models.models import TblAgentTaskStatus
-
+import os, sys
 
 def agentmonitordaemon():
     # getting status of worker and  uppdating hat information to hg monitor
@@ -83,17 +83,26 @@ def agentmonitordaemon():
         except sqlite3.Error as er:
             my_logger.info(er)
             my_logger.info(sys.exc_info()[0])
-            #return 'sqlite error'
+            # return 'sqlite error'
         except Exception as e:
             print  "Some this went wrong", sys.exc_info()[0]
             my_logger.info(e)
             my_logger.info(sys.exc_info()[0])
-            #return e.message
-        #producer.close()
+            # return e.message
+        # producer.close()
         time.sleep(20)
 
+
 def agentmonitorscheduler():
-    #scheduler = BackgroundScheduler()
-    #scheduler.add_job(agentmonitordaemon, 'cron', minute='*/1')
-    #scheduler.start()
-    agentmonitordaemon()
+    try:
+        print "agentmonitorscheduler is running.."
+        agentmonitordaemon()
+
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
+        my_logger.info("Calling itself.. agentmonitorscheduler")
+        agentmonitorscheduler()

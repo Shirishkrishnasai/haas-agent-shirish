@@ -11,7 +11,7 @@ from application.common.load_config import loadconfig
 from application.common.loggerfile import my_logger
 from application.configfile import kafka_server_url
 from application.models.models import TblAgentTaskStatus
-from kafka import KafkaConsumer
+from confluent_kafka import Consumer
 from sqlalchemy.orm import scoped_session
 
 
@@ -19,37 +19,43 @@ def _supervisoragent():
     my_logger.info('in supervisor')
     print "in gent supervisor"
     agent_id, customer_id, cluster_id = loadconfig()
-    print "agent info file information", agent_id,customer_id,cluster_id
-    consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=agent_id)
-    consumer.subscribe(pattern='tasks_*')
+    print "agent info file information", agent_id, customer_id, cluster_id
+    consumer = Consumer({
+        'bootstrap.servers': kafka_server_url,
+        'group.id': "supervisor" + str(agent_id),
+        'auto.offset.reset': 'earliest'
+    })
+    # consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id=)
+    consumer.subscribe(['^tasks.*'])
+    # consumer.subscribe(pattern='*')
     while True:
         try:
-            message = consumer.poll(timeout_ms=1000, max_records=5)
+            # message = consumer.poll(timeout_ms=1000, max_records=5)
+            message = consumer.poll(1.0)
             print "in while loop -------------supervisor polled"
             print message
-            if message != {}:
-                topicMesages = message.values()
-                for messageValues in topicMesages[0]:
-
-                    consumer_data = messageValues.value
-                    data = consumer_data.replace("'", '"')
-                    tasks_data = json.loads(data)
-                    if tasks_data['event_type'] == "tasks":
-                        if agent_id == tasks_data['agent_id']:
-                            task_execution = multiprocessing.Process(target=runExecution,
-                                                                     args=([tasks_data]))
-                            task_execution.start()
-			    task_execution.join()
-
+            if message is not None:
+                topicMesages = message.value()
+                consumer_data = topicMesages
+                data = consumer_data.replace("'", '"')
+                tasks_data = json.loads(data)
+                if tasks_data['event_type'] == "tasks":
+                    if agent_id == tasks_data['agent_id']:
+                        task_execution = multiprocessing.Process(target=runExecution,
+                                                                 args=([tasks_data]))
+                        task_execution.start()
+                        task_execution.join()
+                consumer.commit()
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             my_logger.error(exc_type)
             my_logger.error(fname)
             my_logger.error(exc_tb.tb_lineno)
+
         finally:
-            #consumer.close()
-            pass
+        # consumer.close()
+         pass
         time.sleep(10)
 
 
