@@ -65,6 +65,7 @@ def agentmonitordaemon():
                     my_logger.info("print all the data that has to be given from kafka status producer")
                     my_logger.info(task_status_data)
 
+
                     producer.send(kafkatopic, str(task_status_data))
                     producer.flush()
                     my_logger.info("doneeeeeeee-doneeeeeeeeeeee-londonnnnnnnnnnnnn")

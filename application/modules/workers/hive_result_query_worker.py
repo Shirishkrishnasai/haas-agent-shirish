@@ -4,11 +4,9 @@ import json
 from datetime import datetime
 from application.common.loggerfile import my_logger
 
-from application.configfile import hive_connection, kafka_server_url, file_upload_url
+from application.configfile import hive_connection, server_url
 
 from application.common.hive import HiveQuery
-import time
-from kafka import KafkaProducer
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblHiveQueryStatus
@@ -51,11 +49,6 @@ def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,
                 string_tuple_list = json.dumps([list(map(str, eachTuple)) for eachTuple in hive_result['output']])
                 print string_tuple_list,type(string_tuple_list),"huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
 
-                #output_string = {}
-                #output_string[str(hive_result['description'][0][0])] = string_tuple_list
-
-
-
                 hive_result_data['output'] = json.dumps(string_tuple_list).encode('base64','strict')
                 hive_result_data['message'] = "query executed successfully"
 
@@ -80,10 +73,11 @@ def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,
             hive_result_data['message'] = "an error occured...submit the query again"
 
         hive_result_data['hive_request_id'] = str(hive_request_id)
-        producer = KafkaProducer(bootstrap_servers=[kafka_server_url])
-        kafka_topic = "hivequeryresult_" + customer_id + "_" + cluster_id
-        kafkatopic = kafka_topic.decode('utf-8')
-        producer.send(kafkatopic, str(hive_result_data))
-        producer.flush()
-        print hive_result_data
-        print "produced"
+
+        url = server_url + 'hivequeryoutput'
+        data = json.dumps(hive_result_data)
+        print data
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        requests.post(url, data=data, headers=headers)
+        print 'done'
+

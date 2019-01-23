@@ -11,7 +11,7 @@ from application.common.load_config import loadconfig
 from application.common.loggerfile import my_logger
 from application.configfile import kafka_server_url
 from application.models.models import TblAgentTaskStatus
-from confluent_kafka import Consumer
+#from confluent_kafka import Consumer
 from sqlalchemy.orm import scoped_session
 
 
