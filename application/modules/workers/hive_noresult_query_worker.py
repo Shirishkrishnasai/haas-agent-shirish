@@ -1,39 +1,27 @@
-import requests
+import requests,os,sys
 import json
-
 from datetime import datetime
+from application.configfile import hive_connection, server_url
 from application.common.loggerfile import my_logger
-
-from application.configfile import hive_connection, kafka_server_url, file_upload_url
 from application.common.hive import HiveQuery
-import sys
-#print sys.path
-#sys.path.append('./application/common/')
-from application.common.hive import HiveQuery
-#print sys.path
-import time
-from pyhive import hive
-from TCLIService.ttypes import TOperationState
-from kafka import KafkaProducer
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblHiveQueryStatus
-
-
 def hiveNoResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,cluster_id):
 
-        status_dict = {
-        0: "INITIALIZED",
-        1: "RUNNING",
-        2: "FINISHED",
-        3: "CANCELED",
-        4: "CLOSED",
-        5: "ERROR",
-        6: "UNKNOWN",
-        7: "PENDING",
-        8: "TIMEDOUT",
-    }
-    #try:
+
+    status_dict = {
+    0: "INITIALIZED",
+    1: "RUNNING",
+    2: "FINISHED",
+    3: "CANCELED",
+    4: "CLOSED",
+    5: "ERROR",
+    6: "UNKNOWN",
+    7: "PENDING",
+    8: "TIMEDOUT",
+}
+    try:
         print "in hive no result query worker"
 
         hive_query_decode = hive_query.decode('base64', 'strict')
@@ -73,9 +61,21 @@ def hiveNoResultQueryWorker(query_database,hive_query,hive_request_id,customer_i
             hive_result_data['message'] = "an error occured...submit the query again"
 
         hive_result_data['hive_request_id'] = str(hive_request_id)
-        producer = KafkaProducer(bootstrap_servers=[kafka_server_url])
-        kafka_topic = "hivequeryresult_" + customer_id + "_" + cluster_id
-        kafkatopic = kafka_topic.decode('utf-8')
-        producer.send(kafkatopic, str(hive_result_data))
-        producer.flush()
-        print "produced"
+
+        url = server_url + 'hivequeryoutput'
+        data = json.dumps(hive_result_data)
+        print data
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        requests.post(url, data=data, headers=headers)
+        print 'done'
+
+        print hive_result_data
+
+    except Exception as e :
+
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)

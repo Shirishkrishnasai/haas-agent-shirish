@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from application.common.loggerfile import my_logger
 
-from application.configfile import hive_connection, kafka_server_url, file_upload_url
+from application.configfile import hive_connection, kafka_server_url, file_upload_url,server_url
 from application.common.hive import HiveQuery
 import sys
 #print sys.path
@@ -105,10 +105,9 @@ def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hi
 
         hive_result_data['hive_request_id'] = str(hive_request_id)
 
-
-        producer = KafkaProducer(bootstrap_servers=[kafka_server_url])
-        kafka_topic = "hivequeryresult_" + customer_id + "_" + cluster_id
-        kafkatopic = kafka_topic.decode('utf-8')
-        producer.send(kafkatopic, str(hive_result_data))
-        producer.flush()
-        print "produced"
+        url = server_url + 'hivequeryoutput'
+        data = json.dumps(hive_result_data)
+        print data
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        requests.post(url, data=data, headers=headers)
+        print 'done'

@@ -51,6 +51,26 @@ class TblMrJobInfo(Base):
 	var_job_diagnostic_status = Column(String(20))
 	var_conf_folder_name = Column(String)
 
+class TblAgentWorkerTaskMapping(Base):
+	__tablename__='tbl_agent_worker_task_mapping'
+
+	srl_id=Column(Integer,primary_key=True)
+	uid_task_id=Column(String(50))
+	uid_agent_id=Column
+	txt_payload_id=Column(String(40))
+	lng_task_type_id=Column(String(40))
+	txt_description=Column(String(40))
+	txt_agent_worker_version=Column(String(50))
+	var_agent_worker_file_name=Column(String(50))
+	txt_path=Column(Text)
+	ts_version_updated_datetime=Column(DateTime)
+	bool_restart_needed_on_upgrade=Column(DateTime)
+	var_created_by=Column(String(20))
+	var_modified_by=Column(String(20))
+	ts_created_datetime=Column(DateTime)
+	ts_modified_datetime=Column(DateTime)
+	var_task_status =Column(Integer)
+
 Base.metadata.create_all(bind=engine)
 ins = inspect(engine)
 for _t in ins.get_table_names():
