@@ -21,12 +21,12 @@ from application.modules.workers.filebrowser import webhdfs
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
 from application.modules.daemons.metrics_producer import kafkaMetricsProducerScheduler
-
+from application.modules.daemons.agent_daemon import agentdaemonscheduler
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
 from application.modules.daemons.metrics_producer import kafkaMetricsProducerScheduler
 #from application.modules.daemons.hive_result_query_worker import hiveSelectQueryResult
-from application.modules.daemons.supervisor import supervisoragent
+from application.modules.daemons.supervisor import supervisorcheduler
 from application.modules.daemons.hive_query_consumer import hiveQueryConsumerScheduler
 from application.modules.daemons.hive_status_producer import hiveStatusScheduler
 
@@ -64,13 +64,15 @@ def runProcess():
     """ add More processs here to run parallelly"""
 
     #filebrowsing_process=Process(target=webhdfs)
-    #filebrowsing_process.start()
+    #filebrowsing_process.start()`
     # kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
     # kafkaMetricsProducerScheduler_Process.start()
-    # supervisoragent_Process=Process(target=supervisoragent)
-    # supervisoragent_Process.start()
-    # agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
-    # agentmonitorscheduler_Process.start()
+    supervisoragent_Process=Process(target=supervisorcheduler)
+    supervisoragent_Process.start()
+    agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
+    agentmonitorscheduler_Process.start()
+    agentdaemonscheduler_Process = Process(target=agentdaemonscheduler)
+    agentdaemonscheduler_Process.start()
 
     hiveQueryConsumer_Process = Process(target=hiveQueryConsumerScheduler())
     hiveQueryConsumer_Process.start()
