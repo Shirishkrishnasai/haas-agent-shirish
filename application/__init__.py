@@ -67,12 +67,12 @@ def runProcess():
     #filebrowsing_process.start()`
     # kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
     # kafkaMetricsProducerScheduler_Process.start()
-    supervisoragent_Process=Process(target=supervisorcheduler)
-    supervisoragent_Process.start()
-    agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
-    agentmonitorscheduler_Process.start()
-    agentdaemonscheduler_Process = Process(target=agentdaemonscheduler)
-    agentdaemonscheduler_Process.start()
+    #supervisoragent_Process=Process(target=supervisorcheduler)
+    #supervisoragent_Process.start()
+    #agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
+    #agentmonitorscheduler_Process.start()
+    #agentdaemonscheduler_Process = Process(target=agentdaemonscheduler)
+    #agentdaemonscheduler_Process.start()
 
     hiveQueryConsumer_Process = Process(target=hiveQueryConsumerScheduler())
     hiveQueryConsumer_Process.start()
