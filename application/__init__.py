@@ -59,6 +59,12 @@ def site_map():
 
 
 agentregisterfunc()
+agentdaemonscheduler()
+supervisorcheduler()
+agentmonitorscheduler()
+
+
+
 #print __name__,"Running..."
 def runProcess():
     """ add More processs here to run parallelly"""
@@ -74,15 +80,15 @@ def runProcess():
     #agentdaemonscheduler_Process = Process(target=agentdaemonscheduler)
     #agentdaemonscheduler_Process.start()
 
-    hiveQueryConsumer_Process = Process(target=hiveQueryConsumerScheduler())
-    hiveQueryConsumer_Process.start()
+    #hiveQueryConsumer_Process = Process(target=hiveQueryConsumerScheduler())
+    #hiveQueryConsumer_Process.start()
 
     #job_diagnostics_producer_Process = Process(target=jobdiagnostics)
     #job_diagnostics_producer_Process.start()
     #job_status_producer_Process = Process(target=jobstatus)
     #job_status_producer_Process.start()
 
-    hiveDatabaseQueryConsumer_Process = Process(target=hiveDatabaseQueryConsumer)
+    #hiveDatabaseQueryConsumer_Process = Process(target=hiveDatabaseQueryConsumer)
     #hiveDatabaseQueryConsumer_Process.start()
     #hiveStatusScheduler_Process = Process(target=hiveStatusScheduler)
     #hiveStatusScheduler_Process.start()

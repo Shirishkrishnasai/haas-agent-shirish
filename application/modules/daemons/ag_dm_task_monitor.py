@@ -3,6 +3,8 @@ import json
 import logging
 import sys
 import time
+from apscheduler.schedulers.background import BackgroundScheduler
+
 
 import requests
 from application.common.load_config import loadconfig
@@ -26,7 +28,7 @@ def agentmonitordaemon():
             agent_id, customer_id, cluster_id = loadconfig()
             print agent_id, customer_id, cluster_id
             select_task_status = db_session.query(TblAgentTaskStatus.uid_task_id,TblAgentTaskStatus.var_task_status,TblAgentTaskStatus.bool_flag).all()
-            print select_task_status, ".............in agent task monitor.py"
+            print select_task_status, "......................in agent task monitor.py"
             my_logger.info("agent task status daemon fetched tasks")
             for each_task in select_task_status:
                 print each_task, ".............in agent task monitor.py"
@@ -52,9 +54,10 @@ def agentmonitordaemon():
                     my_logger.info("print all the data that has to be given from kafka status producer")
                     print task_status_data, ".............in agent task monitor.py"
                     url=server_url+hgmonitor_connection
-                    print url
+                    print url, "now this api for status posting................."
                     headers={'content-type':'application/json','Accept':'text/plain'}
                     requests.post(url,data=json.dumps(task_status_data),headers=headers)
+                    print "agent monitor daemon posted all the status to serverrrrrrrrr ..."
                     update_task_flag_query = db.session.query(TblAgentTaskStatus).filter(
                         TblAgentTaskStatus.uid_task_id == each_task[0])
                     update_task_flag_query.update({"bool_flag": 1})
@@ -71,15 +74,6 @@ def agentmonitordaemon():
 
 
 def agentmonitorscheduler():
-    try:
-        print "agentmonitorscheduler is running.."
-        agentmonitordaemon()
-
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        my_logger.error(exc_type)
-        my_logger.error(fname)
-        my_logger.error(exc_tb.tb_lineno)
-        my_logger.info("Calling itself.. agentmonitorscheduler")
-        agentmonitorscheduler()
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(agentmonitordaemon, 'cron', minute='*/1')
+    scheduler.start()
