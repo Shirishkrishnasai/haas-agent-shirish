@@ -19,7 +19,7 @@ def agentdaemon():
     print "in agent daemon program"
 # calling hgmanager for its tasks
     url=server_url+'hgmanager/'+agent_id
-    print url
+    print url, " this agent daemon just called the hgmanager apiiiiiii"
     r = requests.get(url)
     req_data = r.json()
     print (req_data),type(req_data)
@@ -42,7 +42,7 @@ def agentdaemon():
             session.add(data)
             session.commit()
             session.close()
-            print  "agent daemon.py sucess"
+            print  "agent daemon committed to database. will run in next minute........................meanwhile check the table"
 def agentdaemonscheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(agentdaemon,'cron',minute='*/1' )
