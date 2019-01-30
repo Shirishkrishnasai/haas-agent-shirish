@@ -61,13 +61,11 @@ def agentmonitordaemon():
                         TblAgentTaskStatus.uid_task_id == each_task[0])
                     update_task_flag_query.update({"bool_flag": 1})
                     db_session.commit()
-                    db_session.close()
 
                     print 'task update to hgmonitor successfull'
 
                 else:
                     pass
-                    db_session.close()
         except sqlite3.Error as er:
             my_logger.info(er)
             my_logger.info(sys.exc_info()[0])
@@ -75,7 +73,8 @@ def agentmonitordaemon():
             print  "Some this went wrong", sys.exc_info()[0]
             my_logger.info(e)
             my_logger.info(sys.exc_info()[0])
-        time.sleep(20)
+        finally:
+            db_session.close()
 
 
 def agentmonitorscheduler():
