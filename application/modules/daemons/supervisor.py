@@ -88,7 +88,8 @@ def runExecution(tasks_data):
             my_logger.info("running status is updated in task status and bool flag is set to false as this is new entry")
             print "supervisor committed to database..........in supervisor.py"
             db_session = scoped_session(session_factory)
-            if payloadid == None:
+            if payloadid == str(None):
+
                 my_logger.info("there is no payload id that is y this block is being executed now")
                 print "there is no payload id that is y this block is being executed now..........in supervisor.py"
 
@@ -125,6 +126,7 @@ def runExecution(tasks_data):
 
             else:
                     my_logger.info("there is payload id that is y this block is being executed")
+
                     print "there is payload id that is y this block is being executed..........in supervisor.py"
                     pathlist = path.split("/")
                     print path,pathlist
