@@ -13,7 +13,7 @@ from sqlalchemy.orm import scoped_session
 
 logging.basicConfig()
 import sqlite3
-from application import sqlite_string, db, session_factory
+from application import sqlite_string, session_factory
 from application.configfile import kafka_server_url, agentinfo_path, server_url, hgmonitor_connection
 from application.common.loggerfile import my_logger
 from application.models.models import TblAgentTaskStatus
@@ -22,7 +22,6 @@ import os, sys
 def agentmonitordaemon():
     # getting status of worker and  uppdating hat information to hg monitor
 
-    while True:
         try:
             db_session = scoped_session(session_factory)
             agent_id, customer_id, cluster_id = loadconfig()
@@ -58,11 +57,17 @@ def agentmonitordaemon():
                     headers={'content-type':'application/json','Accept':'text/plain'}
                     requests.post(url,data=json.dumps(task_status_data),headers=headers)
                     print "agent monitor daemon posted all the status to serverrrrrrrrr ..."
-                    update_task_flag_query = db.session.query(TblAgentTaskStatus).filter(
+                    update_task_flag_query = db_session.query(TblAgentTaskStatus).filter(
                         TblAgentTaskStatus.uid_task_id == each_task[0])
                     update_task_flag_query.update({"bool_flag": 1})
-                    db.session.commit()
+                    db_session.commit()
+                    db_session.close()
+
                     print 'task update to hgmonitor successfull'
+
+                else:
+                    pass
+                    db_session.close()
         except sqlite3.Error as er:
             my_logger.info(er)
             my_logger.info(sys.exc_info()[0])
