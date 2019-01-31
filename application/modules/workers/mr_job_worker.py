@@ -2,8 +2,7 @@ import requests
 import json
 import shutil
 import os
-from kafka import KafkaProducer
-from application.configfile import agentinfo_path,kafka_bootstrap_server, kafka_api_version,download_url
+from application.configfile import agentinfo_path,kafka_bootstrap_server, kafka_api_version,download_url,server_url
 
 from application.common.job_management import MapRedResourceManager
 import time
@@ -76,9 +75,6 @@ def mrjobworker(request_id):
     db_session.close()
     print 'home'
 
-    producer = KafkaProducer(bootstrap_servers=kafka_bootstrap_server)
-    kafkatopic="mrjobapplication_"+customerid+"_"+clusterid
-    kafkatopic = kafkatopic.decode('utf-8')
     mrjob_data={}
     mrjob_data["event_type"]= "mapreducejob"
     mrjob_data["request_id"]=str(request_id)
@@ -87,6 +83,8 @@ def mrjobworker(request_id):
     mrjob_data["agent_id"]=str(agent_id)
     mrjob_data["application_id"]=str(application_id)
     mrjob_data["status"]='SUBMITTED'
-    producer.send(kafkatopic, str(mrjob_data))
-    producer.flush()
+    url=server_url+"/jobupdate"
+    headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
+    r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
+
 
