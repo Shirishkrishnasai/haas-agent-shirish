@@ -17,36 +17,40 @@ from sqlalchemy.orm import scoped_session
 
 
 def _supervisoragent():
-    try :
-        db_session=scoped_session(session_factory)
-        my_logger.info('in supervisor')
-        print "in gent supervisor"
-        agent_id, customer_id, cluster_id = loadconfig()
-        print "agent info file information", agent_id, customer_id, cluster_id
-        taskupdate= db_session.query(TblAgentWorkerTaskMapping.uid_task_id,TblAgentWorkerTaskMapping.txt_path,
-                                     TblAgentWorkerTaskMapping.txt_payload_id).filter(TblAgentWorkerTaskMapping.var_task_status=="initialised").all()
-        print taskupdate,type(taskupdate)
-        tasks_data=[]
-        for task in taskupdate:
-            print task
-            tasks_dat={}
-            tasks_dat['taskid']=str(task[0])
-            tasks_dat['worker_path']=str(task[1])
-            tasks_dat['payload_id']=str(task[2])
-            tasks_data.append(tasks_dat)
-        print tasks_data,type(tasks_data)
-        task_execution = multiprocessing.Process(target=runExecution,args=([tasks_data]))
-        task_execution.start()
-        task_execution.join()
 
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        my_logger.error(exc_type)
-        my_logger.error(fname)
-        my_logger.error(exc_tb.tb_lineno)
-    finally:
-        db_session.close()
+    while True:
+
+        try :
+            db_session=scoped_session(session_factory)
+            my_logger.info('in supervisor')
+            print "in gent supervisor"
+            agent_id, customer_id, cluster_id = loadconfig()
+            print "agent info file information", agent_id, customer_id, cluster_id
+            taskupdate= db_session.query(TblAgentWorkerTaskMapping.uid_task_id,TblAgentWorkerTaskMapping.txt_path,
+                                         TblAgentWorkerTaskMapping.txt_payload_id).filter(TblAgentWorkerTaskMapping.var_task_status=="initialised").all()
+            print taskupdate,type(taskupdate)
+            tasks_data=[]
+            for task in taskupdate:
+                print task
+                tasks_dat={}
+                tasks_dat['taskid']=str(task[0])
+                tasks_dat['worker_path']=str(task[1])
+                tasks_dat['payload_id']=str(task[2])
+                tasks_data.append(tasks_dat)
+            print tasks_data,type(tasks_data)
+            task_execution = multiprocessing.Process(target=runExecution,args=([tasks_data]))
+            task_execution.start()
+            task_execution.join()
+
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            my_logger.error(exc_type)
+            my_logger.error(fname)
+            my_logger.error(exc_tb.tb_lineno)
+        finally:
+            db_session.close()
+    time.sleep(5)
 
 def supervisoragent():
     try:
