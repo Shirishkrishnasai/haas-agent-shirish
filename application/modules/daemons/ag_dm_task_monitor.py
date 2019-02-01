@@ -1,4 +1,4 @@
-import json, time
+import json
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
@@ -13,7 +13,6 @@ from application.models.models import TblAgentTaskStatus
 import os, sys
 
 def agentmonitordaemon():
-    while True:
     # getting status of worker and  uppdating hat information to hg monitor
 
         try:
@@ -42,7 +41,7 @@ def agentmonitordaemon():
                 payload_data['task_id'] = str(each_task[0])
                 payload_data['status'] = str(each_task[1])
                 task_status_data['payload'] = payload_data
-                print task_status_data, "....................................................................in agent task monitor.py"
+                print task_status_data, "..........................................................in agent task monitor.py"
                 url=server_url+hgmonitor_connection
                 print url, "now this api for status posting................."
                 headers={'content-type':'application/json','Accept':'text/plain'}
@@ -65,8 +64,6 @@ def agentmonitordaemon():
             my_logger.info(sys.exc_info()[0])
         finally:
             db_session.close()
-
-    time.sleep(10)
 
 
 def agentmonitorscheduler():
