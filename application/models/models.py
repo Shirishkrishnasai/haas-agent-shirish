@@ -2,7 +2,7 @@ from sqlalchemy import BigInteger, Boolean, CHAR, Column, DateTime, ForeignKey, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import UUID
 
-db_url = 'sqlite:////opt/agent/haas'
+db_url = 'sqlite:////home/hadoop/map-reduce/haas-agent/haas'
 engine = create_engine(db_url)
 
 

@@ -13,12 +13,13 @@ from application.models.models import TblMrJobInfo
 
 def mrjobworker(request_id):
     print request_id
-    info = open(agentinfo_path, "r")
+    info = open('agent_info.txt', "r")
+    print info
     content = info.read()
     data_req = json.loads(content, 'utf-8')
     agent_id = str(data_req['agent_id'])
     #agent_id='c28bef0e-de9a-11e8-917e-3ca9f49ab2cc'
-
+    print agent_id,'agent'
     db_session = scoped_session(session_factory)
     uid = db_session.query(TblMrJobInfo.uid_conf_upload_id,TblMrJobInfo.uid_jar_upload_id).filter(TblMrJobInfo.uid_request_id == request_id).all()
     print uid,"uid query"
