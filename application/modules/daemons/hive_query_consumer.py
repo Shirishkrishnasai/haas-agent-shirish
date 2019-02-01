@@ -12,10 +12,10 @@ from kafka import KafkaConsumer
 from sqlalchemy.orm import scoped_session
 from application.common.load_config import loadconfig
 def hiveQueryConsumer():
-    agent_id,customer_id,cluster_id = loadconfig()
+            agent_id,customer_id,cluster_id = loadconfig()
     #while True:
-    try:
-            agent_id = '99942cea-14bb-11e9-a5ca-2c413893d8f0'
+    #try:
+            agent_id = 'c188975e-251b-11e9-8b29-000d3af26ae3'
             url = server_url+"hivequery/"+agent_id
             print url
             headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
@@ -71,13 +71,13 @@ def hiveQueryConsumer():
                         db_session.close()
 
 
-    except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            my_logger.error(exc_type)
-            my_logger.error(fname)
-            my_logger.error(exc_tb.tb_lineno)
-    #time.sleep(10)
+    # except Exception as e:
+    #         exc_type, exc_obj, exc_tb = sys.exc_info()
+    #         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    #         my_logger.error(exc_type)
+    #         my_logger.error(fname)
+    #         my_logger.error(exc_tb.tb_lineno)
+    # #time.sleep(10)
 
 
 def hiveQueryConsumerScheduler():
