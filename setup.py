@@ -17,8 +17,8 @@ setup(
 	'pyhive',
 	'thrift',
 	'sasl',
-	'thrift_sasl',
-'confluent-kafka==0.11.6'
+	'thrift_sasl'
+#'confluent-kafka==0.11.6'
 
     ],
 
