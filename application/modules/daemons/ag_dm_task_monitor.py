@@ -1,4 +1,4 @@
-import json
+import json, time
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
@@ -13,6 +13,7 @@ from application.models.models import TblAgentTaskStatus
 import os, sys
 
 def agentmonitordaemon():
+    while True:
     # getting status of worker and  uppdating hat information to hg monitor
 
         try:
@@ -64,6 +65,8 @@ def agentmonitordaemon():
             my_logger.info(sys.exc_info()[0])
         finally:
             db_session.close()
+
+    time.sleep(10)
 
 
 def agentmonitorscheduler():
