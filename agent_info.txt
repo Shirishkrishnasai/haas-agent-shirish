@@ -1,1 +1,1 @@
-{"customer_id":"bc17feba-1aef-11e9-a566-000d3af26ae2","cluster_id":"42d30516-1b00-11e9-a566-000d3af26ae2","role":"namenode","agent_id":"42d30517-1b00-11e9-a566-000d3af26ae2","agent_version":"1.0"}
+{"customer_id":"bc17feba-1aef-11e9-a566-000d3af26ae2","cluster_id":"42d30516-1b00-11e9-a566-000d3af26ae2","role":"namenode","agent_id":"c188975e-251b-11e9-8b29-000d3af26ae2","agent_version":"1.0"}

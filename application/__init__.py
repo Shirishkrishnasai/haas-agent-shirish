@@ -7,16 +7,16 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['Access-Control-Allow-Origin'] = '*'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////opt/agent/haas'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///home/hadoop/map-reduce/haas-agent/haas'
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
 db = SQLAlchemy(app)
 
-engine = create_engine("sqlite:////opt/agent/haas")
+engine = create_engine("sqlite:////home/hadoop/map-reduce/haas-agent/haas")
 session_factory = sessionmaker(bind=engine)
-sqlite_string= "/opt/agent/haas"
+sqlite_string= "/home/hadoop/map-reduce/haas-agent/haas"
 from application.modules.workers.filebrowser import webhdfs
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
@@ -57,12 +57,11 @@ def site_map():
     # links is now a list of url, endpoint tuples
     print (links)
 
-
-agentregisterfunc()
-agentdaemonscheduler()
-supervisorcheduler()
-agentmonitorscheduler()
-
+insertjob()
+#agentregisterfunc()
+#agentdaemonscheduler()
+#supervisorcheduler()
+#agentmonitorscheduler()
 
 
 #print __name__,"Running..."

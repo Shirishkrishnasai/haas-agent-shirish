@@ -18,7 +18,7 @@ setup(
 	'thrift',
 	'sasl',
 	'thrift_sasl',
-'confluent-kafka==0.11.6'
+#'confluent-kafka==0.11.6'
 
     ],
 
