@@ -17,7 +17,7 @@ def hiveQueryConsumer():
     #try:
             agent_id = 'c188975e-251b-11e9-8b29-000d3af26ae3'
             url = server_url+"hivequery/"+agent_id
-            print url
+            print url,'urllll'
             headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
             api_response = requests.get(url, headers = headers).json()
             print json.dumps(api_response)
@@ -26,8 +26,9 @@ def hiveQueryConsumer():
                 print "no messages for now"
                 pass
             else:
-
+                print 'in elseeee'
                 for query_data in api_response:
+                        print query_data,'queryyyyyyyyy'
                         db_session = scoped_session(session_factory)
                         hive_query = query_data['query_string']
                         query_database = query_data['database']
@@ -35,7 +36,7 @@ def hiveQueryConsumer():
                         hive_request_id = query_data['hive_request_id']
 
                         if query_data['output_type'] == 'url':
-
+                            print 'in ifffffffffffff'
                             explain_query = query_data['explain']
                             select_query_process = multiprocessing.Process(target=hiveSelectQueryWorker,
                                                                            args=([output_type, query_database,
@@ -48,6 +49,7 @@ def hiveQueryConsumer():
                             my_logger.info("select query process done........")
 
                         elif query_data['output_type'] == 'tuples':
+                            print 'in elifffffffffff'
                             result_query_process = multiprocessing.Process(target=hiveResultQueryWorker,
                                                                            args=([query_database, hive_query,
                                                                                   hive_request_id, customer_id,
@@ -58,6 +60,7 @@ def hiveQueryConsumer():
                             my_logger.info("hive result query process done........")
 
                         else:
+                            print 'in elseeeeeeeeeeeeeee'
                             noresult_query_process = multiprocessing.Process(target=hiveNoResultQueryWorker,
                                                                              args=([query_database, hive_query,
                                                                                     hive_request_id, customer_id,
@@ -81,7 +84,8 @@ def hiveQueryConsumer():
 
 
 def hiveQueryConsumerScheduler():
-	scheduler = BackgroundScheduler()
-	scheduler.add_job(hiveQueryConsumer,'cron',minute='*/1')
-	scheduler.start()
-	pass
+    scheduler = BackgroundScheduler()
+#	scheduler.add_job(hiveQueryConsumer,'cron',second='*/1')
+    scheduler.add_job(hiveQueryConsumer, 'cron', minute='*/1')
+    scheduler.start()
+    pass
