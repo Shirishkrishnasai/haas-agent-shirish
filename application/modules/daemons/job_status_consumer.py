@@ -21,7 +21,9 @@ def statusconsumer():
             print json_loads_job_data['application_id']
             meta_request_status_query = session.query(TblMetaMrRequestStatus.srl_id).filter(TblMetaMrRequestStatus.var_mr_request_status == json_loads_job_data['status'])
 
-            update_customer_job_request=session.query(TblCustomerJobRequest).filter(TblCustomerJobRequest.uid_customer_id==json_loads_job_data['customer_id'],TblCustomerJobRequest.var_application_id==json_loads_job_data['application_id'])
+            update_customer_job_request=session.query(TblCustomerJobRequest).\
+                filter(TblCustomerJobRequest.uid_customer_id==json_loads_job_data['customer_id'],
+                       TblCustomerJobRequest.var_application_id==json_loads_job_data['application_id'])
            # print update_customer_job_request
             update_customer_job_request.update({"int_request_status":meta_request_status_query[0][0]})
             session.commit()

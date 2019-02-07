@@ -23,7 +23,10 @@ def insertjob():
             data = job_details.replace("'", '"')
             message = json.loads(data)
          #   if message['agent_id'] == agent_id:
-            insert_mr_job_info=TblMrJobInfo(var_resourcemanager_ip=message['resourcemanager_ip'],uid_request_id=message['request_id'],uid_customer_id=message['customer_id'],uid_cluster_id=message['cluster_id'],uid_conf_upload_id=message['uid_conf_upload_id'],uid_jar_upload_id=message['uid_jar_upload_id'],var_job_status='CREATED',bool_job_status_produce=0,var_job_diagnostic_status='CREATED')
+            insert_mr_job_info=TblMrJobInfo(var_resourcemanager_ip=message['resourcemanager_ip'],uid_request_id=message['request_id'],
+                                            uid_customer_id=message['customer_id'],uid_cluster_id=message['cluster_id'],
+                                            uid_conf_upload_id=message['uid_conf_upload_id'],uid_jar_upload_id=message['uid_jar_upload_id'],
+                                            var_job_status='CREATED',bool_job_status_produce=0,var_job_diagnostic_status='CREATED')
             session.add(insert_mr_job_info)
             print "add"
             session.commit()
