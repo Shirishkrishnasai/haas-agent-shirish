@@ -3,6 +3,7 @@ import json
 import shutil
 import os
 from application.configfile import agentinfo_path,kafka_bootstrap_server, kafka_api_version,download_url,server_url
+
 import conf
 from application.common.job_management import MapRedResourceManager
 import time
@@ -98,5 +99,9 @@ def mrjobworker(request_id):
     print conf.get('hadoop.http.staticuser.user')
     r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
 
+
+    url=server_url+"/jobupdate"
+    headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
+    r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
 
 
