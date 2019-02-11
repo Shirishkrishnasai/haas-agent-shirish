@@ -29,7 +29,7 @@ from application.modules.daemons.metrics_producer import kafkaMetricsProducerSch
 from application.modules.daemons.supervisor import supervisorcheduler
 from application.modules.daemons.hive_query_consumer import hiveQueryConsumerScheduler
 from application.modules.daemons.hive_status_producer import hiveStatusScheduler
-
+from application.modules.apis.jobapi import mapredjob
 from application.modules.daemons.hive_database_query_consumer import hiveDatabaseQueryConsumer
 from application.modules.daemons.job_diagnostics_producer import jobdiagnostics
 from application.modules.daemons.job_status_producer import jobstatus
@@ -40,6 +40,8 @@ from application.modules.daemons.job_status_producer import jobstatus
 from application.modules.daemons.job_insertion import insertjob
 #from application.modules.workers.file_upload_to_hdfs import fileuploadhdfs
 from multiprocessing import Process
+
+app.register_blueprint(mapredjob, url_prefix='')
 
 def has_no_empty_params(rule):
     defaults = rule.defaults if rule.defaults is not None else ()
@@ -56,7 +58,7 @@ def site_map():
             links.append((url, rule.endpoint))
     # links is now a list of url, endpoint tuples
     print (links)
-
+jobstatus()
 insertjob()
 #agentregisterfunc()
 #agentdaemonscheduler()

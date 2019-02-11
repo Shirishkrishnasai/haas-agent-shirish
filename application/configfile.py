@@ -10,7 +10,7 @@ kafka_bootstrap_server = ['52.172.28.18:9092']
 kafka_api_version = (0, 10, 1)
 mongo_conn_string = "mongodb://104.211.222.41:27017"
 
-download_url="http://104.211.222.41:5000/filedownload/"
+download_url="http://192.168.100.170:5000/filedownload/"
 hive_connection = "192.168.100.184"
 hive_output_path = "/opt/hiveoutput/"
 file_upload_url = "http://192.168.100.166:5000/fileupload"
