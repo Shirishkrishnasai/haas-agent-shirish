@@ -26,14 +26,12 @@ def hdfsmetricsproducer():
             data['cluster_id']  = str(job_details[1])
             data['event_type']  = "metrics"
 
-            url = server_url + 'api/hdfs_mongo'
+            url = server_url + 'api/hdfs_metrics'
             headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
             print url, json.dumps(data)
             requests.post(url, data=json.dumps(data), headers=headers)
             print 'postedddd'
-            update_job_info_query = session.query(TblMrJobInfo).filter(TblMrJobInfo.var_application_id==job_details[1])
-            update_job_info_query.update({"bool_job_status_produce":1})
-            session.commit()
+
     # except Exception as e:
 		# return e.message
 
