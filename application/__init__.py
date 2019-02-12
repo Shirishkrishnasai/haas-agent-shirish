@@ -29,7 +29,7 @@ from application.modules.daemons.metrics_producer import kafkaMetricsProducerSch
 from application.modules.daemons.supervisor import supervisorcheduler
 from application.modules.daemons.hive_query_consumer import hiveQueryConsumerScheduler
 from application.modules.daemons.hive_status_producer import hiveStatusScheduler
-
+from application.modules.daemons.hdfs_metrics_producer import hdfsmetricsproducer
 from application.modules.daemons.hive_database_query_consumer import hiveDatabaseQueryConsumer
 from application.modules.daemons.job_diagnostics_producer import jobdiagnostics
 from application.modules.daemons.job_status_producer import jobstatus
@@ -79,7 +79,8 @@ def runProcess():
     #agentmonitorscheduler_Process.start()
     #agentdaemonscheduler_Process = Process(target=agentdaemonscheduler)
     #agentdaemonscheduler_Process.start()
-
+    hdfsmetricsproducer_process = Process(target=hdfsmetricsproducer)
+    hdfsmetricsproducer_process.start()
     #hiveQueryConsumer_Process = Process(target=hiveQueryConsumerScheduler())
     #hiveQueryConsumer_Process.start()
 
