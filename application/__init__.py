@@ -58,7 +58,7 @@ def site_map():
     print (links)
 
 
-# agentregisterfunc()
+agentregisterfunc()
 # agentdaemonscheduler()
 # supervisorcheduler()
 # agentmonitorscheduler()
@@ -83,8 +83,8 @@ def runProcess():
     #hiveQueryConsumer_Process = Process(target=hiveQueryConsumerScheduler())
     #hiveQueryConsumer_Process.start()
 
-    job_diagnostics_producer_Process = Process(target=jobdiagnostics)
-    job_diagnostics_producer_Process.start()
+    #job_diagnostics_producer_Process = Process(target=jobdiagnostics)
+    #job_diagnostics_producer_Process.start()
     #job_status_producer_Process = Process(target=jobstatus)
     #job_status_producer_Process.start()
 
