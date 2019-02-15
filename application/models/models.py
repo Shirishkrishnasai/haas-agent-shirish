@@ -49,6 +49,8 @@ class TblMrJobInfo(Base):
 	bool_job_status_produce = Column(Boolean)
 	var_resourcemanager_ip = Column(String(30))
 	var_job_diagnostic_status = Column(String(20))
+	var_file_name = Column(String)
+	var_job_description = Column(String)
 	var_conf_folder_name = Column(String)
 
 class TblAgentWorkerTaskMapping(Base):

@@ -81,12 +81,12 @@ class MapRedResourceManager():
         self.user_name = user
         self.nn_port = nn_port
         self.maxJvm = 512
-        self.mapredCommand = "/opt/hadoop/bin/hadoop jar {} {} -Ddfs.block.size=67108864 {} {}"
+        self.mapredCommand = "/opt/hadoop/bin/hadoop jar {} {} {} {}"
     def _submitJob(self, jobJson=None):
         print jobJson
         self.__makePost(self.getApiUrl(self.__getAppUrl()), json_data=jobJson)
 	return jobJson
-    def submitJob(self, location="localhost", port=None, filename=None, jar_path=None, output=None, noofbytes=None, type="mapr", **kwargs):
+    def submitJob(self, location="localhost", port=None, filename=None, jar_path=None, input=None, output=None, noofbytes=None, type="mapr", **kwargs):
         """
         :param location: to where submit job
         :param port:   port of server
@@ -140,7 +140,7 @@ class MapRedResourceManager():
             "application-name":application_id+"_job",
             "am-container-spec": {
                 "commands":{
-			"command": self.mapredCommand.format(jar_path,filename,noofbytes,output)},
+			"command": self.mapredCommand.format(jar_path,filename,input,output)},
 #                "environment":environment
             },
             "unmanaged-AM": 'false',
@@ -156,6 +156,7 @@ class MapRedResourceManager():
       #  time.sleep(10)
 
         print self._submitJob(jobJson=mapRedJob),111
+	print  new_app_response['application-id']
         return new_app_response['application-id']
 
     def prepareParams(self):

@@ -31,13 +31,12 @@ from application.modules.daemons.hive_query_consumer import hiveQueryConsumerSch
 from application.modules.daemons.hive_status_producer import hiveStatusScheduler
 from application.modules.apis.jobapi import mapredjob
 from application.modules.daemons.hive_database_query_consumer import hiveDatabaseQueryConsumer
-from application.modules.daemons.job_diagnostics_producer import jobdiagnostics
-from application.modules.daemons.job_status_producer import jobstatus
+from application.modules.daemons.job_diagnostics_producer import jobdiagnosticsscheduler
+from application.modules.daemons.job_status_producer import jobstatusscheduler
+from application.modules.daemons.job_insertion import jobinsertionscheduler
 from configfile import hive_connection
 hivyc = hive_connection
-from application.modules.daemons.job_diagnostics_producer import jobdiagnostics
-from application.modules.daemons.job_status_producer import jobstatus
-from application.modules.daemons.job_insertion import insertjob
+
 #from application.modules.workers.file_upload_to_hdfs import fileuploadhdfs
 from multiprocessing import Process
 
@@ -58,18 +57,20 @@ def site_map():
             links.append((url, rule.endpoint))
     # links is now a list of url, endpoint tuples
     print (links)
-jobstatus()
-insertjob()
 #agentregisterfunc()
 #agentdaemonscheduler()
 #supervisorcheduler()
 #agentmonitorscheduler()
-
-
+jobstatusscheduler()
+jobinsertionscheduler()
+jobdiagnosticsscheduler()
 #print __name__,"Running..."
 def runProcess():
     """ add More processs here to run parallelly"""
-
+#    jobstatus_process=Process(target=jobstatusscheduler)
+#    jobstatus_process.start()
+#    insertjob_process=Process(target=jobinsertionscheduler)
+#    insertjob_process.start()
     #filebrowsing_process=Process(target=webhdfs)
     #filebrowsing_process.start()`
     # kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
@@ -94,9 +95,9 @@ def runProcess():
     #hiveStatusScheduler_Process = Process(target=hiveStatusScheduler)
     #hiveStatusScheduler_Process.start()
     print "running Processs....",__name__,"running process"
-#if __name__ == "application":
-    #print "running process again",__name__
-    #runProcess()
+if __name__ == "application":
+    print "running process again",__name__
+    runProcess()
 
 
 #hiveExplain()

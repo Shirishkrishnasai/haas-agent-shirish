@@ -4,38 +4,42 @@ from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblMrJobInfo
 from application.modules.workers.mr_job_worker import mrjobworker
+from apscheduler.schedulers.background import BackgroundScheduler
 from application.configfile import server_url
 import requests
-
+from application.common.loggerfile import my_logger
 import json
-
+import sys,os
 def insertjob():
     try:
         session = scoped_session(session_factory)
         url = server_url + 'api/mrjob'
-        print url, " this agent daemon just called the hgmanager apiiiiiii"
 
         r = requests.get(url)
-	print r
         req_data = r.json()
-        print (req_data), type(req_data)
         for data in req_data['message']:
-            print data
-
-         #   if data['agent_id'] == agent_id:
+	    print data
             insert_mr_job_info=TblMrJobInfo(var_resourcemanager_ip=data['resourcemanager_ip'],
                                             uid_request_id=data['request_id'],
                                             uid_customer_id=data['customer_id'],
                                             uid_cluster_id=data['cluster_id'],
-                                            uid_conf_upload_id=data['uid_conf_upload_id'],
-                                            uid_jar_upload_id=data['uid_jar_upload_id'],
+					    var_file_name=data['filename'],
+					    var_job_description=data['job_description'],
                                             var_job_status='CREATED',bool_job_status_produce=0,
                                             var_job_diagnostic_status='CREATED')
             session.add(insert_mr_job_info)
-            print "add"
             session.commit()
-            print "inserted"
             mrjobworker(data['request_id'])
-            print "commited"
     except Exception as e:
-      print e.message
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            my_logger.error(exc_type)
+            my_logger.error(fname)
+            my_logger.error(exc_tb.tb_lineno)
+
+
+def jobinsertionscheduler():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(insertjob, 'cron', second='*/20')
+    scheduler.start()
+
