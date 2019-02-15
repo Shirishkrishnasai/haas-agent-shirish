@@ -9,7 +9,7 @@ from application.configfile import server_url, agentinfo_path, agentregistration
 
 
 def agentregisterfunc():
-    #try:
+    try:
         print 'in agent register daemon'
         agent_data = open(agentinfo_path, "r")
         content = agent_data.read()
@@ -47,5 +47,5 @@ def agentregisterfunc():
             os.system(execute_statement)
         else:
             exit()
-    # except Exception as e:
-    #     print e.message
+    except Exception as e:
+         print e.message
