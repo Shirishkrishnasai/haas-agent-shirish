@@ -44,7 +44,7 @@ def mrjobworker(request_id):
 	    r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
 
 
-	    url=server_url+"/jobupdate"
+	    url=server_url+"api/jobupdation"
 	    headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
 	    r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
 	except Exception as e:
