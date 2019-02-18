@@ -15,7 +15,7 @@ def hiveQueryConsumer():
             agent_id,customer_id,cluster_id = loadconfig()
     #while True:
     #try:
-            agent_id = 'c188975e-251b-11e9-8b29-000d3af26ae3'
+            #agent_id = 'c188975e-251b-11e9-8b29-000d3af26ae3'
             url = server_url+"hivequery/"+agent_id
             print url
             headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
@@ -82,6 +82,6 @@ def hiveQueryConsumer():
 
 def hiveQueryConsumerScheduler():
 	scheduler = BackgroundScheduler()
-	scheduler.add_job(hiveQueryConsumer,'cron',minute='*/1')
+	scheduler.add_job(hiveQueryConsumer,'cron',second='*/5')
 	scheduler.start()
 	pass

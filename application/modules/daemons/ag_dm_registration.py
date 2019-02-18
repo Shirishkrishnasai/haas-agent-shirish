@@ -3,7 +3,7 @@ import logging
 import os
 
 import requests
-
+from azure.storage.file import FileService
 logging.basicConfig()
 from application.configfile import server_url, agentinfo_path, agentregistration_connection, azure_credentials_url
 
@@ -27,6 +27,7 @@ def agentregisterfunc():
         print 'done'
 
         azure_credential_url = server_url + azure_credentials_url + customer_id
+        #print azure_credential_url
         get_azure_credetials = requests.get(azure_credential_url)
         print get_azure_credetials, 'gettttttttttttt'
         dict_azure_credentials = get_azure_credetials.json()
@@ -35,13 +36,18 @@ def agentregisterfunc():
         azure_account_key = dict_azure_credentials['key']
         azure_share_name = cluster_id
         print azure_share_name, 'shareeee'
-        # Script details
-        script_path = "/opt/scripts"
-        script_name = 'azure-mount-share.sh'
-        script_arguments = azure_account_name + ' ' + azure_account_key + ' ' + azure_share_name
-        execute_statement = "bash" + ' ' + script_path + '/' + script_name + ' ' + script_arguments
-        # execute_statement = 'dir'
-        executed_status = os.system(execute_statement)
+        file_service = FileService(account_name=azure_account_name, account_key=azure_account_key)
 
+        if file_service.exists(azure_share_name) == True:
+            # Script details
+            print 'inside'
+            script_path = "/opt/scripts"
+            script_name = 'azure-mount-share.sh'
+            script_arguments = azure_account_name + ' ' + azure_account_key + ' ' + azure_share_name
+            execute_statement = "bash" + ' ' + script_path + '/' + script_name + ' ' + script_arguments
+            # execute_statement = 'dir'
+            os.system(execute_statement)
+        else:
+            pass
     except Exception as e:
-        print e.message
+         print e.message

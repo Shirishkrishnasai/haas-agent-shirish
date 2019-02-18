@@ -171,5 +171,5 @@ def runExecution(tasks_data):
     #     db_session.close()
 def supervisorcheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(supervisoragent,'cron',minute='*/1' )
+    scheduler.add_job(supervisoragent,'cron',second='*/5' )
     scheduler.start()

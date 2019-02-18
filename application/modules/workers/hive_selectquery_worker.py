@@ -67,7 +67,7 @@ def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hi
 
                     #mnt_file = os.system('hadoop fs -copyToLocal /hive_request_id /mnt/MyAzureFileShare/')
                     # mnt_file = os.system('hdfs dfs -cat /'+hive_request_id+'/000000_0 >> /opt/mnt/MyAzureFileShare/'+hive_request_id)
-                    mnt_file = os.system("hdfs dfs -cat /" + hive_request_id + "/000000_0 | sed -e  's/\x01/,/g'> /opt/mnt/MyAzureFileShare/" + hive_request_id)
+                    mnt_file = os.system("hdfs dfs -cat /" + hive_request_id + "/000000_0 | sed -e  's/\x01/,/g'> /opt/mnt/azurefileshare/hive/" + hive_request_id)
                     print mnt_file
                     print "ok now check the mount directory...u r doneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 

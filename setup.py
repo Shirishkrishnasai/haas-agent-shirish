@@ -7,7 +7,7 @@ setup(
     platforms='any',
     install_requires=[
         'Flask==1.0.2',
-        'requests==2.19.0',
+        'requests==2.20.0',
         'Flask-Cors==3.0.6',
         'apscheduler==3.5.1',
         'SQLAlchemy==1.2.0',
@@ -17,7 +17,9 @@ setup(
 	'pyhive',
 	'thrift',
 	'sasl',
-	'thrift_sasl'
+	'thrift_sasl',
+	'azure==4.0.0',
+	'azure-storage-file'
 #'confluent-kafka==0.11.6'
 
     ],

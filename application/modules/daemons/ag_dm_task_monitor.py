@@ -68,5 +68,5 @@ def agentmonitordaemon():
 
 def agentmonitorscheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(agentmonitordaemon, 'cron', minute='*/1')
+    scheduler.add_job(agentmonitordaemon, 'cron', second='*/5')
     scheduler.start()

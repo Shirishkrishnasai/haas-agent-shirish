@@ -62,7 +62,7 @@ agentregisterfunc()
 agentdaemonscheduler()
 supervisorcheduler()
 agentmonitorscheduler()
-
+hiveQueryConsumerScheduler()
 
 
 #print __name__,"Running..."

@@ -55,5 +55,5 @@ def agentdaemon():
         session.close()
 def agentdaemonscheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(agentdaemon,'cron',minute='*/1' )
+    scheduler.add_job(agentdaemon,'cron',second='*/5' )
     scheduler.start()

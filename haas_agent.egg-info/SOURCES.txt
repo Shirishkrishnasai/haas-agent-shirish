@@ -4,6 +4,7 @@ application/configfile.py
 application/common/__init__.py
 application/common/hive.py
 application/common/job_management.py
+application/common/load_config.py
 application/common/loggerfile.py
 application/common/test.py
 application/models/__init__.py
@@ -13,6 +14,7 @@ application/modules/apis/__init__.py
 application/modules/daemons/__init__.py
 application/modules/daemons/ag_dm_registration.py
 application/modules/daemons/ag_dm_task_monitor.py
+application/modules/daemons/agent_daemon.py
 application/modules/daemons/hive_database_query_consumer.py
 application/modules/daemons/hive_query_consumer.py
 application/modules/daemons/hive_status_producer.py
