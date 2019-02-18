@@ -29,9 +29,13 @@ def kafkaMetricsProducer():
             kafka_topic = "metrics_" + customer_id + "_" + cluster_id
             my_logger.debug(kafka_topic)
             kafkatopic = kafka_topic.decode('utf-8')
+            print "getting ram_metrics"
             ram_metrics = ramMetrics()
+            print "getting cpu metrics"
             cpu_metrics = cpuMetrics()
+            print "getting network metrics"
             network_metrics = network()
+            print "getting storage metrics"
             storage_metrics = storage()
             disk_metrics = disk()
 
@@ -49,11 +53,9 @@ def kafkaMetricsProducer():
             metrics_data['cluster_id'] = cluster_id
             metrics_data['agent_id'] = agent_id
             metrics_data['payload'] = metrics_list
-            # my_logger.debug(metrics_data)
-            # metricSubscriber(data=metrics_data)
             producer.send(kafkatopic, str(metrics_data))
             producer.flush()
-            #my_logger.debug("done for producer")
+            print "metricss produced"
         except Exception as e:
             #my_logger.error("Some error caught", e.message)
             return e
@@ -61,7 +63,7 @@ def kafkaMetricsProducer():
 
 
 def kafkaMetricsProducerScheduler():
-    # scheduler = BackgroundScheduler()
-    # scheduler.add_job(kafkaMetricsProducer,'cron',minute='*/1' )
-    # scheduler.start()
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(kafkaMetricsProducer,'cron',minute='*/1' )
+    scheduler.start()
     kafkaMetricsProducer()

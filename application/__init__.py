@@ -58,11 +58,11 @@ def site_map():
     print (links)
 
 
-agentregisterfunc()
-agentdaemonscheduler()
-supervisorcheduler()
-agentmonitorscheduler()
-hiveQueryConsumerScheduler()
+# agentregisterfunc()
+# agentdaemonscheduler()
+# supervisorcheduler()
+# agentmonitorscheduler()
+# hiveQueryConsumerScheduler()
 
 
 #print __name__,"Running..."
@@ -71,8 +71,8 @@ def runProcess():
 
     #filebrowsing_process=Process(target=webhdfs)
     #filebrowsing_process.start()`
-    # kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
-    # kafkaMetricsProducerScheduler_Process.start()
+    kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
+    kafkaMetricsProducerScheduler_Process.start()
     #supervisoragent_Process=Process(target=supervisorcheduler)
     #supervisoragent_Process.start()
     #agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
