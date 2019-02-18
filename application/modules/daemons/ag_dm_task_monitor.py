@@ -44,13 +44,20 @@ def agentmonitordaemon():
                 print task_status_data, "..........................................................in agent task monitor.py"
                 url=server_url+hgmonitor_connection
                 print url, "now this api for status posting................."
+
                 headers={'content-type':'application/json','Accept':'text/plain'}
-                requests.post(url,data=json.dumps(task_status_data),headers=headers)
+                value=requests.post(url,data=json.dumps(task_status_data),headers=headers)
+                status= value.json()
+                print status
+                # calu = requests.response(value)
+                # print calu
                 print "agent monitor daemon posted all the status to serverrrrrrrrr ..."
-                update_task_flag_query = db_session.query(TblAgentTaskStatus).filter(
-                    TblAgentTaskStatus.uid_task_id == each_task[0])
-                update_task_flag_query.update({"bool_flag": 1})
-                db_session.commit()
+                if status== "sucess" :
+                    print "in if"
+                    update_task_flag_query = db_session.query(TblAgentTaskStatus).filter(
+                                TblAgentTaskStatus.uid_task_id == each_task[0])
+                    update_task_flag_query.update({"bool_flag": 1})
+                    db_session.commit()
 
                 print 'task update to hgmonitor successfull'
 
@@ -68,5 +75,5 @@ def agentmonitordaemon():
 
 def agentmonitorscheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(agentmonitordaemon, 'cron', second='*/5')
+    scheduler.add_job(agentmonitordaemon, 'cron', second='*/9')
     scheduler.start()

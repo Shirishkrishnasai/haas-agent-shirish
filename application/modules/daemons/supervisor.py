@@ -34,10 +34,13 @@ def _supervisoragent():
             tasks_dat['worker_path']=str(task[1])
             tasks_dat['payload_id']=str(task[2])
             tasks_data.append(tasks_dat)
-        print tasks_data,type(tasks_data)
-        task_execution = multiprocessing.Process(target=runExecution,args=([tasks_data]))
-        task_execution.start()
-        task_execution.join()
+        print tasks_data,"this is task data "
+        if tasks_data!=[]:
+            task_execution = multiprocessing.Process(target=runExecution,args=([tasks_data]))
+            task_execution.start()
+            task_execution.join()
+        else :
+            print "no tasks to execute"
 
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -64,10 +67,10 @@ def supervisoragent():
 
 def runExecution(tasks_data):
     db_session = scoped_session(session_factory)
-    # try:
-    my_logger.info("agent_id verification done.....and this is true agent")
-    print "supervisor------------agent_id verification done.....and this is true agent"
-    for tasks in tasks_data :
+    try:
+        my_logger.info("agent_id verification done.....and this is true agent")
+        print "supervisor------------agent_id verification done.....and this is true agent"
+        for tasks in tasks_data :
             task_id = str(tasks['taskid'])
             print task_id
             path = str(tasks['worker_path'])
@@ -161,15 +164,15 @@ def runExecution(tasks_data):
                         db_session.close()
                     my_logger.info("last statement in supervisor...updation done")
                     print "last statement in supervisor...updation done.... supervisor.py completed"
-    # except Exception as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    #     my_logger.error(exc_type)
-    #     my_logger.error(fname)
-    #     my_logger.error(exc_tb.tb_lineno)
-    # finally:
-    #     db_session.close()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
+    finally:
+        db_session.close()
 def supervisorcheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(supervisoragent,'cron',second='*/5' )
+    scheduler.add_job(supervisoragent,'cron',second='*/7' )
     scheduler.start()
