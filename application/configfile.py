@@ -14,7 +14,3 @@ download_url="http://104.211.222.41:5000/filedownload/"
 hive_connection = "localhost"
 hive_output_path = "/opt/hiveoutput/"
 file_upload_url = "http://192.168.100.166:5000/fileupload"
-azure_mount_path = '/opt/mnt/azurefileshare'
-azure_mount_path = '/opt/mnt/azurefileshare'
-azure_mount_path = '/opt/mnt/azurefileshare'
-azure_mount_path = '/opt/mnt/azurefileshare'

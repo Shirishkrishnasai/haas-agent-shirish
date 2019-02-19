@@ -31,8 +31,9 @@ from application.modules.daemons.hive_query_consumer import hiveQueryConsumerSch
 from application.modules.daemons.hive_status_producer import hiveStatusScheduler
 
 from application.modules.daemons.hive_database_query_consumer import hiveDatabaseQueryConsumer
-from application.modules.daemons.job_diagnostics_producer import jobdiagnostics
-from application.modules.daemons.job_status_producer import jobstatus
+from application.modules.daemons.job_diagnostics_producer import jobdiagnosticsscheduler
+from application.modules.daemons.job_status_producer import jobstatusscheduler
+from application.modules.daemons.job_insertion import jobinsertionscheduler
 from configfile import hive_connection
 hivyc = hive_connection
 from application.modules.daemons.job_diagnostics_producer import jobdiagnostics
@@ -65,6 +66,13 @@ def site_map():
 # hiveQueryConsumerScheduler()
 
 
+#agentregisterfunc()
+#agentdaemonscheduler()
+#supervisorcheduler()
+#agentmonitorscheduler()
+jobstatusscheduler()
+jobinsertionscheduler()
+jobdiagnosticsscheduler()
 #print __name__,"Running..."
 def runProcess():
     """ add More processs here to run parallelly"""

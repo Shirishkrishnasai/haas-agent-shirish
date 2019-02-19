@@ -37,6 +37,7 @@ def mrjobworker(request_id):
 	    mrjob_data["request_id"]=str(request_id)
 	    mrjob_data["customer_id"]=str(customerid)
 	    mrjob_data["cluster_id"]=str(clusterid)
+	    mrjob_data["agent_id"]=str(agent_id)
 	    mrjob_data["application_id"]=str(application_id)
 	    mrjob_data["status"]='SUBMITTED'
 	    url=server_url+"api/jobupdation"
@@ -44,7 +45,7 @@ def mrjobworker(request_id):
 	    r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
 
 
-	    url=server_url+"api/jobupdation"
+	    url=server_url+"/jobupdate"
 	    headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
 	    r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
 	except Exception as e:
