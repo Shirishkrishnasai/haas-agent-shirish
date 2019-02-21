@@ -21,16 +21,16 @@ def jobstatus():
         for job_details in job_info_query:
             appnumber=job_details[1].split("_")
             appincrement=int(appnumber[-1])+1
-	    applicationid=str(appincrement).zfill(4)
+            applicationid=str(appincrement).zfill(4)
             replaceappid=job_details[1].replace(str(appnumber[-1]),str(applicationid))
             jobstatus_statement="http://"+job_details[5]+":8088/ws/v1/cluster/apps/" +replaceappid+"/state"
-	    token=requests.get(jobstatus_statement)
-	    print token
-	    print type(token)
+            token=requests.get(jobstatus_statement)
+            print token
+            print type(token)
             jobstatus_dict=token.json()
-	    print jobstatus_dict
+            print jobstatus_dict
             application_data = {"customer_id":job_details[3],"status": jobstatus_dict["state"], "request_id": job_details[0], "application_id": job_details[1]}
-	    job_list.append(application_data)
+            job_list.append(application_data)
             update_jobinfo_query = session.query(TblMrJobInfo).filter(TblMrJobInfo.uid_request_id==job_details[0],TblMrJobInfo.var_application_id==job_details[1])
             update_jobinfo_query.update({"var_job_status":jobstatus_dict["state"]})
             session.commit()

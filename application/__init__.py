@@ -59,28 +59,28 @@ def site_map():
     print (links)
 
 
-# agentregisterfunc()
-# agentdaemonscheduler()
-# supervisorcheduler()
-# agentmonitorscheduler()
-# hiveQueryConsumerScheduler()
-
-
 #agentregisterfunc()
 #agentdaemonscheduler()
 #supervisorcheduler()
 #agentmonitorscheduler()
+#hiveQueryConsumerScheduler()
 jobstatusscheduler()
 jobinsertionscheduler()
 jobdiagnosticsscheduler()
 #print __name__,"Running..."
 def runProcess():
     """ add More processs here to run parallelly"""
+#    jobinsertion_process=Process(target=jobinsertionscheduler)
+#    jobinsertion_process.start()
+#    jobdiagnostics_process=Process(target=jobdiagnosticsscheduler)
+#    jobdiagnostics_process.start()
+#    jobstatus_process=Process(target=jobstatusscheduler)
+ #   jobstatus_process.start()
 
     #filebrowsing_process=Process(target=webhdfs)
     #filebrowsing_process.start()`
-    kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
-    kafkaMetricsProducerScheduler_Process.start()
+#    kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
+#    kafkaMetricsProducerScheduler_Process.start()
     #supervisoragent_Process=Process(target=supervisorcheduler)
     #supervisoragent_Process.start()
     #agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)
@@ -102,8 +102,8 @@ def runProcess():
     #hiveStatusScheduler_Process.start()
     print "running Processs....",__name__,"running process"
 #if __name__ == "application":
-    #print "running process again",__name__
-    #runProcess()
+#    print "running process again",__name__
+#    runProcess()
 
 
 #hiveExplain()

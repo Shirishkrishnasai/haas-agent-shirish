@@ -24,7 +24,7 @@ def _supervisoragent():
         agent_id, customer_id, cluster_id = loadconfig()
         print "agent info file information", agent_id, customer_id, cluster_id
         taskupdate= db_session.query(TblAgentWorkerTaskMapping.uid_task_id,TblAgentWorkerTaskMapping.txt_path,
-                                     TblAgentWorkerTaskMapping.txt_payload_id).filter(TblAgentWorkerTaskMapping.var_task_status=="initialised").all()
+                                     TblAgentWorkerTaskMapping.txt_payload_id).filter(TblAgentWorkerTaskMapping.var_task_status=="INITIALISED").all()
         print taskupdate,type(taskupdate)
         tasks_data=[]
         for task in taskupdate:
@@ -76,7 +76,7 @@ def runExecution(tasks_data):
             path = str(tasks['worker_path'])
             payloadid = str(tasks['payload_id'])
             starttime = datetime.datetime.now()
-            task_status_insert_data = TblAgentTaskStatus(var_task_status='running',
+            task_status_insert_data = TblAgentTaskStatus(var_task_status='RUNNING',
                                                              ts_execution_start_datetime=starttime,
                                                              uid_task_id=task_id,
                                                              bool_flag=0
@@ -85,7 +85,7 @@ def runExecution(tasks_data):
             db_session.add(task_status_insert_data)
             db_session.commit()
             task_update = db_session.query(TblAgentWorkerTaskMapping).filter(TblAgentWorkerTaskMapping.uid_task_id== task_id)
-            task_update.update({"var_task_status": "running"})
+            task_update.update({"var_task_status": "RUNNING"})
             db_session.commit()
             print "added"
             my_logger.info("running status is updated in task status and bool flag is set to false as this is new entry")
@@ -119,7 +119,7 @@ def runExecution(tasks_data):
                         endtime = datetime.datetime.now()
                         update_task_status_query = db_session.query(TblAgentTaskStatus).filter(
                             TblAgentTaskStatus.uid_task_id == task_id)
-                        update_task_status_query.update({"var_task_status": "completed",
+                        update_task_status_query.update({"var_task_status": "COMPLETED",
                                                          "bool_flag": 0,
                                                          "ts_finished_datetime": endtime})
                         db_session.commit()
@@ -159,7 +159,7 @@ def runExecution(tasks_data):
                     if execute == 0:
                         endtime = datetime.datetime.now()
                         taskstatusupdate = db_session.query(TblAgentTaskStatus).filter(TblAgentTaskStatus.uid_task_id == task_id)
-                        taskstatusupdate.update({'var_task_status':'completed','bool_flag': 0,'ts_finished_datetime': endtime})
+                        taskstatusupdate.update({'var_task_status':'COMPLETED','bool_flag': 0,'ts_finished_datetime': endtime})
                         db_session.commit()
                         db_session.close()
                     my_logger.info("last statement in supervisor...updation done")

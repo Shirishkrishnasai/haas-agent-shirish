@@ -8,9 +8,10 @@ from kafka import KafkaProducer
 import json
 import requests
 from application.common.loggerfile import my_logger
+import os,sys
 
 def jobdiagnostics():
-    try:
+    #try:
         session = scoped_session(session_factory)
 
         job_info_query=session.query(TblMrJobInfo.uid_request_id,TblMrJobInfo.var_application_id,TblMrJobInfo.var_job_status,
@@ -35,13 +36,13 @@ def jobdiagnostics():
             update_job_info_query = session.query(TblMrJobInfo).filter(TblMrJobInfo.var_application_id==job_details[1])
             update_job_info_query.update({"bool_job_status_produce":1})
             session.commit()
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-
-        my_logger.error(exc_type)
-        my_logger.error(fname)
-        my_logger.error(exc_tb.tb_lineno)
+    # except Exception as e:
+    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+    #     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    #
+    #     my_logger.error(exc_type)
+    #     my_logger.error(fname)
+    #     my_logger.error(exc_tb.tb_lineno)
 
 def jobdiagnosticsscheduler():
     scheduler = BackgroundScheduler()

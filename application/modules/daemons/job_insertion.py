@@ -12,24 +12,28 @@ import json
 import sys,os
 def insertjob():
     try:
+        print "in"
         session = scoped_session(session_factory)
         url = server_url + 'api/mrjob'
 
         r = requests.get(url)
         req_data = r.json()
+        print req_data
         for data in req_data['message']:
-	    print data
             insert_mr_job_info=TblMrJobInfo(var_resourcemanager_ip=data['resourcemanager_ip'],
                                             uid_request_id=data['request_id'],
                                             uid_customer_id=data['customer_id'],
                                             uid_cluster_id=data['cluster_id'],
-					    var_file_name=data['filename'],
-					    var_job_description=data['job_description'],
+					                        var_file_name=data['filename'],
+					                        var_job_description=data['job_description'],
+                                            var_job_parameters=data['job_parameters'],
                                             var_job_status='CREATED',bool_job_status_produce=0,
                                             var_job_diagnostic_status='CREATED')
             session.add(insert_mr_job_info)
             session.commit()
+            print "out "
             mrjobworker(data['request_id'])
+            print "worker finished"
     except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
