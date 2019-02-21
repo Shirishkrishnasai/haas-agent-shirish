@@ -73,19 +73,20 @@ class HDFSManager():
 
 class MapRedResourceManager():
 
-    def __init__(self, address=None, port=8088, timeout=30, nn_address=None, nn_port=None, user="hadoop"):
+    def __init__(self, address=None, port=8088, timeout=30, nn_address=None, nn_port=None, user='hadoop'):
         self.address = address
         self.port = port
         self.timeout = timeout
         self.nn_address = nn_address
-        self.username = user
+        self.user_name = user
         self.nn_port = nn_port
         self.maxJvm = 512
-        self.mapredCommand = "hadoop jar {} {} -D {} {} {}"
+        self.mapredCommand = "/opt/hadoop/bin/hadoop jar {} {}"
     def _submitJob(self, jobJson=None):
-        return self.__makePost(self.getApiUrl(self.__getAppUrl()), json_data=jobJson)
-
-    def submitJob(self, location="localhost", port=None, jar_path=None, filename=None,filepath=None,input=None, output=None,  type="mapr", **kwargs):
+        print jobJson
+        self.__makePost(self.getApiUrl(self.__getAppUrl()), json_data=jobJson)
+	return jobJson
+    def submitJob(self, location="localhost", port=None,job_parameters=None, filename=None, jar_path=None, input=None, output=None, noofbytes=None, type="mapr", **kwargs):
         """
         :param location: to where submit job
         :param port:   port of server
@@ -99,20 +100,25 @@ class MapRedResourceManager():
         """
 
         api_endpoint = 'http://{}:{}{}/new-application'.format(self.address, self.port, self.__getAppUrl())
-        print api_endpoint\
+        print api_endpoint,"api"
 
         appid = requests.post(api_endpoint, None, None, headers=self.__getHeaders());
 
         new_app_response = json.loads(appid.content)
         application_id = new_app_response['application-id']
+	print new_app_response,"applicationcontent"
         resources = {
             "memory": (1024 if not kwargs.get("memory") else kwargs.get("memory")),
             "vCores": (1 if not kwargs.get("vcores") else kwargs.get("vcores"))
         }
-        print resources
+        print resources,'resources'
         environment = {
             "entry":
                 [
+		    {
+			"key":"HADOOP_HOME",
+                     	"value":"/opt/hadoop"
+		    },
                     {
                         "key": "DISTRIBUTEDSHELLSCRIPTTIMESTAMP",
                         "value": "1405459400754"
@@ -120,7 +126,7 @@ class MapRedResourceManager():
 
                     {
                         "key": "CLASSPATH",
-                        "value": "{{CLASSPATH}}<CPS>./*<CPS>{{HADOOP_CONF_DIR}}<CPS>{{HADOOP_COMMON_HOME}}/share/hadoop/common/*<CPS>{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*<CPS>{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*<CPS>{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*<CPS>{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*<CPS>{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/*<CPS>./log4j.properties"
+			"value": "{{CLASSPATH}}<CPS>./*<CPS>{{HADOOP_HOME}}<CPS>{{HADOOP_HOME}}/share/hadoop/common/*<CPS>{{HADOOP_COMMON_HOME}}/share/hadoop/common/lib/*<CPS>{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/*<CPS>{{HADOOP_HDFS_HOME}}/share/hadoop/hdfs/lib/*<CPS>{{HADOOP_YARN_HOME}}/share/hadoop/yarn/*<CPS>{{HADOOP_YARN_HOME}}/share/hadoop/yarn/lib/*<CPS>./log4j.properties"
                     },
                     {
                         "key": "DISTRIBUTEDSHELLSCRIPTLEN",
@@ -131,23 +137,26 @@ class MapRedResourceManager():
         }
         mapRedJob = {
             "application-id": application_id,
-            "application-name": application_id + "_job",
+            "application-name":application_id+"_job",
             "am-container-spec": {
-                "commands": self.mapredCommand.format(jar_path,filename,filepath,input,output),
-                "environment":environment
+                "commands":{
+			"command": self.mapredCommand.format(jar_path,job_parameters)},
+#                "environment":environment
             },
             "unmanaged-AM": 'false',
-            "max-app-attempts": 2,
+            "max-app-attempts": '1',
             "resource": {
                 "memory": (1024 if not kwargs.get("memory") else kwargs.get("memory")),
                 "vCores": (1 if not kwargs.get("vcores") else kwargs.get("vcores"))
             },
-            "application-type": "MAPREDUCE",
-            "keep-containers-across-application-attempts": 'false'
+            "application-type": "YARN",
+            "keep-containers-across-application-attempts": 'true'
         }
         print (mapRedJob)
-        time.sleep(10)
-        print self._submitJob(jobJson=mapRedJob)
+      #  time.sleep(10)
+
+        print self._submitJob(jobJson=mapRedJob),111
+	print  new_app_response['application-id']
         return new_app_response['application-id']
 
     def prepareParams(self):

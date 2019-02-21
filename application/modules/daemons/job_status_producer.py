@@ -1,37 +1,53 @@
 from sqlalchemy.orm import scoped_session
 from application import session_factory
+from apscheduler.schedulers.background import BackgroundScheduler
 from application.models.models import TblMrJobInfo
 import subprocess
-
-from application.configfile import kafka_bootstrap_server, kafka_api_version
-import re
-import json
-from kafka import KafkaProducer
+from application.configfile import server_url
+import json, requests
+import sys,os,json
+from application.common.loggerfile import my_logger
 
 
 def jobstatus():
     try:
 
-        print "in job staus"
         session = scoped_session(session_factory)
-        job_info_query=session.query(TblMrJobInfo.uid_request_id,TblMrJobInfo.var_application_id,TblMrJobInfo.var_job_status,TblMrJobInfo.uid_customer_id,TblMrJobInfo.uid_cluster_id,TblMrJobInfo.var_resourcemanager_ip).filter(TblMrJobInfo.var_job_status !='FAILED',TblMrJobInfo.var_job_status != 'FINISHED')
+        job_info_query=session.query(TblMrJobInfo.uid_request_id,TblMrJobInfo.var_application_id,
+                                     TblMrJobInfo.var_job_status,TblMrJobInfo.uid_customer_id,
+                                     TblMrJobInfo.uid_cluster_id,TblMrJobInfo.var_resourcemanager_ip).\
+            filter(TblMrJobInfo.var_job_status !='FAILED',TblMrJobInfo.var_job_status != 'FINISHED').all()
+	job_list=[]
         for job_details in job_info_query:
-            print job_details
-            topic_string="job_status"+"_"+job_details[3]+"_"+job_details[4]
-            jobstatus=subprocess.Popen("curl http://"+job_details[5]+":8088/ws/v1/cluster/apps/" +job_details[1]+"/ state",shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            token,err=jobstatus.communicate()
+            appnumber=job_details[1].split("_")
+            appincrement=int(appnumber[-1])+1
+            applicationid=str(appincrement).zfill(4)
+            replaceappid=job_details[1].replace(str(appnumber[-1]),str(applicationid))
+            jobstatus_statement="http://"+job_details[5]+":8088/ws/v1/cluster/apps/" +replaceappid+"/state"
+            token=requests.get(jobstatus_statement)
             print token
-            jobstatus_dict=json.loads(token)
-            producer = KafkaProducer(bootstrap_servers=kafka_bootstrap_server)
-            kafkatopic = topic_string.decode('utf-8')
-            string=json.dumps({"customer_id":job_details[3],"status": jobstatus_dict["app"]["state"], "request_id": job_details[0], "application_id": job_details[1]})
-            print jobstatus_dict["app"]["state"]
-            producer.send(kafkatopic,string)
-            producer.flush()
-            print "in"
-
+            print type(token)
+            jobstatus_dict=token.json()
+            print jobstatus_dict
+            application_data = {"customer_id":job_details[3],"status": jobstatus_dict["state"], "request_id": job_details[0], "application_id": job_details[1]}
+            job_list.append(application_data)
             update_jobinfo_query = session.query(TblMrJobInfo).filter(TblMrJobInfo.uid_request_id==job_details[0],TblMrJobInfo.var_application_id==job_details[1])
-            update_jobinfo_query.update({"var_job_status":jobstatus_dict["app"]["state"]})
+            update_jobinfo_query.update({"var_job_status":jobstatus_dict["state"]})
             session.commit()
+        url = server_url + 'job_status'
+        headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
+        requests.post(url, data=json.dumps(job_list), headers=headers)
+
     except Exception as e:
-		return e.message
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
+
+def jobstatusscheduler():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(jobstatus, 'cron', second='*/20')
+    scheduler.start()
+

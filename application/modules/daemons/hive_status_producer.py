@@ -4,7 +4,7 @@ import requests
 import json
 from kafka import KafkaProducer
 import logging
-import sys
+import sys,os
 logging.basicConfig()
 import sqlite3
 from application.configfile import kafka_server_url, agentinfo_path

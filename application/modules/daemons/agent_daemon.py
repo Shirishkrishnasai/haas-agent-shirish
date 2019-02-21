@@ -40,7 +40,7 @@ def agentdaemon():
                                                txt_payload_id=payload_id,
                                                var_agent_worker_file_name=worker_version,
                                                txt_path=worker_version_path,
-                                               var_task_status="initialised")
+                                               var_task_status="INITIALISED")
                     session.add(data)
                     session.commit()
                     print  "agent daemon committed to database. will run in next minute........................meanwhile check the table"
