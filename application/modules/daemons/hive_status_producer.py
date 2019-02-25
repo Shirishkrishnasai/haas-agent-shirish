@@ -1,10 +1,8 @@
-import datetime
 import time
-import requests
 import json
 from kafka import KafkaProducer
 import logging
-import sys,os
+import sys
 logging.basicConfig()
 import sqlite3
 from application.configfile import kafka_server_url, agentinfo_path
@@ -63,7 +61,6 @@ def hiveQueryStatus():
                     TblHiveQueryStatus.uid_hive_request_id == each_row[0])
                 update_querystatus_flag.update({"bool_flag": 1})
                 db_session.commit()
-                db_session.close()
 
                 my_logger.debug("everything doneeeeeeeeeeeeeeeeeeeeeeeeeee")
 
@@ -77,7 +74,8 @@ def hiveQueryStatus():
             my_logger.debug(e)
             my_logger.debug(sys.exc_info()[0])
             #return e.message
-        #producer.close()
+        finally:
+            db_session.close()
         time.sleep(20)
 
 

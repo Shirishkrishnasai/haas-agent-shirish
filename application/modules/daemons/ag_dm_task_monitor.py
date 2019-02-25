@@ -6,11 +6,11 @@ from application.common.load_config import loadconfig
 from sqlalchemy.orm import scoped_session
 logging.basicConfig()
 import sqlite3
-from application import sqlite_string, session_factory
-from application.configfile import agentinfo_path, server_url, hgmonitor_connection
+from application import session_factory
+from application.configfile import  server_url, hgmonitor_connection
 from application.common.loggerfile import my_logger
 from application.models.models import TblAgentTaskStatus
-import os, sys
+import sys
 
 def agentmonitordaemon():
     # getting status of worker and  uppdating hat information to hg monitor

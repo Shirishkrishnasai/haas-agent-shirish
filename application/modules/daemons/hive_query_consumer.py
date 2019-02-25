@@ -1,14 +1,12 @@
-import json,requests,multiprocessing,os,sys,time
+import json,requests,multiprocessing
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from application import session_factory
 from application.common.loggerfile import my_logger
-from application.configfile import agentinfo_path, server_url
+from application.configfile import  server_url
 from application.modules.workers.hive_noresult_query_worker import hiveNoResultQueryWorker
 from application.modules.workers.hive_result_query_worker import hiveResultQueryWorker
-# from application.modules.daemons.hive_explainquery_worker import hiveExplain
 from application.modules.workers.hive_selectquery_worker import hiveSelectQueryWorker
-from kafka import KafkaConsumer
 from sqlalchemy.orm import scoped_session
 from application.common.load_config import loadconfig
 def hiveQueryConsumer():

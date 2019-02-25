@@ -2,7 +2,6 @@ import requests
 import json
 
 from datetime import datetime
-from application.common.loggerfile import my_logger
 
 from application.configfile import hive_connection, server_url
 
@@ -16,7 +15,7 @@ from application.models.models import TblHiveQueryStatus
 
 def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,cluster_id):
 
-        status_dict = {
+    status_dict = {
             0: "INITIALIZED",
             1: "RUNNING",
             2: "FINISHED",
@@ -27,7 +26,7 @@ def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,
             7: "PENDING",
             8: "TIMEDOUT",
         }
-    #try:
+    try:
         print "in hive  result query worker"
         hive_query_decode = hive_query.decode('base64', 'strict')
 
@@ -81,3 +80,13 @@ def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,
         requests.post(url, data=data, headers=headers)
         print 'done'
 
+    except Exception as e:
+
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
+    finally:
+        db_session.close()

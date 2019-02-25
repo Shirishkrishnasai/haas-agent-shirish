@@ -9,7 +9,6 @@ from application.modules.workers.cpu_metric_worker import cpuMetrics
 from application.modules.workers.network_metric_worker import network
 from application.modules.workers.storage_metric_worker import storage
 from application.modules.workers.disk_metric_worker import disk
-#from application.common.metrics_updation import metricSubscriber
 from application.common.loggerfile import my_logger
 
 

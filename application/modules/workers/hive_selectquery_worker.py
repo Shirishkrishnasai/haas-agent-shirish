@@ -2,25 +2,15 @@ import requests
 import json
 import os
 from datetime import datetime
-from application.common.loggerfile import my_logger
 
 from application.configfile import hive_connection, kafka_server_url, file_upload_url,server_url
 from application.common.hive import HiveQuery
-import sys
-#print sys.path
-#sys.path.append('./application/common/')
-from application.common.hive import HiveQuery
-#print sys.path
-import time
-from pyhive import hive
-from TCLIService.ttypes import TOperationState
-from kafka import KafkaProducer
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblHiveQueryStatus
 
 def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hive_request_id,customer_id,cluster_id):
-        status_dict = {
+    status_dict = {
         0: "INITIALIZED",
         1: "RUNNING",
         2: "FINISHED",
@@ -31,7 +21,7 @@ def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hi
         7: "PENDING",
         8: "TIMEDOUT",
     }
-    #try:
+    try:
         print "in hive select query worker"
         hiveClient = HiveQuery(hive_connection, 10000, query_database)
         db_session = scoped_session(session_factory)
@@ -111,3 +101,13 @@ def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hi
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=data, headers=headers)
         print 'done'
+    except Exception as e:
+
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
+    finally:
+        db_session.close()

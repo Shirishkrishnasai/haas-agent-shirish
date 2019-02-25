@@ -1,17 +1,13 @@
 import datetime
-import json
 import multiprocessing
 import os
 import subprocess
 import sys
-import time
 
 from application import session_factory
 from application.common.load_config import loadconfig
 from application.common.loggerfile import my_logger
-from application.configfile import kafka_server_url
 from application.models.models import TblAgentTaskStatus,TblAgentWorkerTaskMapping
-# from confluent_kafka import Consumer
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy.orm import scoped_session
 

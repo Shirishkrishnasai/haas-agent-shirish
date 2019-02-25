@@ -5,8 +5,8 @@ from sqlalchemy.orm import scoped_session
 from application.models.models import TblAgentWorkerTaskMapping
 logging.basicConfig()
 from apscheduler.schedulers.background import BackgroundScheduler
-from application import sqlite_string, session_factory
-from application.configfile import server_url,agentinfo_path
+from application import  session_factory
+from application.configfile import server_url
 from application.common.loggerfile import my_logger
 
 def agentdaemon():

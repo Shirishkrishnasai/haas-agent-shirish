@@ -79,3 +79,5 @@ def hiveNoResultQueryWorker(query_database,hive_query,hive_request_id,customer_i
         my_logger.error(exc_type)
         my_logger.error(fname)
         my_logger.error(exc_tb.tb_lineno)
+    finally:
+        db_session.close()
