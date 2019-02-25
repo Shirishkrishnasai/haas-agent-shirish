@@ -1,6 +1,6 @@
 import requests
 import json
-import os
+import os, sys
 from datetime import datetime
 
 from application.configfile import hive_connection, kafka_server_url, file_upload_url,server_url
@@ -8,6 +8,7 @@ from application.common.hive import HiveQuery
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblHiveQueryStatus
+from application.common.loggerfile import my_logger
 
 def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hive_request_id,customer_id,cluster_id):
     status_dict = {
@@ -22,7 +23,7 @@ def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hi
         8: "TIMEDOUT",
     }
     try:
-        print "in hive select query worker"
+        my_logger.info("in hive select query worker")
         hiveClient = HiveQuery(hive_connection, 10000, query_database)
         db_session = scoped_session(session_factory)
 
@@ -46,7 +47,8 @@ def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hi
                 db_session.commit()
 
                 hive_result = hiveClient.runNoResultQuery(hive_query_decode)
-                print hive_result, type(hive_result)
+                my_logger.info(hive_result)
+                my_logger.info(type(hive_result))
                 if hive_result == 2:
                     explain_status = TblHiveQueryStatus(uid_hive_request_id=hive_request_id,
                                                         var_query_status='FINISHED',
@@ -58,13 +60,14 @@ def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hi
                     #mnt_file = os.system('hadoop fs -copyToLocal /hive_request_id /mnt/MyAzureFileShare/')
                     # mnt_file = os.system('hdfs dfs -cat /'+hive_request_id+'/000000_0 >> /opt/mnt/MyAzureFileShare/'+hive_request_id)
                     mnt_file = os.system("hdfs dfs -cat /" + hive_request_id + "/000000_0 | sed -e  's/\x01/,/g'> /opt/mnt/azurefileshare/hive/" + hive_request_id)
-                    print mnt_file
-                    print "ok now check the mount directory...u r doneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+                    my_logger.info(mnt_file)
+                    my_logger.info("ok now check the mount directory...u r doneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
 
                     hive_result_data['message'] = "query executed successfully,the result is being uploaded."
 
                 elif hive_result == 1 or hive_result == 7:
-                    print hive_result, type(hive_result)
+                    my_logger.info(hive_result)
+                    my_logger.info(type(hive_result))
                     query_status = TblHiveQueryStatus(uid_hive_request_id=hive_request_id,
                                                       var_query_status=status_dict[hive_result],
                                                       ts_status_datetime=datetime.now(),
@@ -97,10 +100,10 @@ def hiveSelectQueryWorker(output_type,query_database,explain_query,hive_query,hi
 
         url = server_url + 'hivequeryoutput'
         data = json.dumps(hive_result_data)
-        print data
+        my_logger.info(data)
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=data, headers=headers)
-        print 'done'
+        my_logger.info('done')
     except Exception as e:
 
         exc_type, exc_obj, exc_tb = sys.exc_info()

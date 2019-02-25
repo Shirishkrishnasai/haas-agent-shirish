@@ -1,11 +1,13 @@
 import requests
-import json
+import json, sys ,os
 from application.configfile import server_url
 from application.common.job_management import MapRedResourceManager
 import time
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblMrJobInfo
+from application.common.loggerfile import my_logger
+
 def mrjobworker(request_id):
 	try:
 		db_session = scoped_session(session_factory)
@@ -18,9 +20,9 @@ def mrjobworker(request_id):
 		job_parameters =maprjob_data[0][4]
 		mr_parameters=job_parameters.replace(",","  ")
 		mapred = MapRedResourceManager(address=IPAddr, port=8088)
-		print IPAddr
+		my_logger.info(IPAddr)
 		application_id=mapred.submitJob(jar_path="/opt/mnt/azurefileshare/sampledir/"+file_name,job_parameters=mr_parameters)
-		print application_id
+		my_logger.info(application_id)
 		object = db_session.query(TblMrJobInfo).filter(TblMrJobInfo.uid_request_id == request_id)
 		object.update({"var_application_id": application_id})
 		db_session.commit()
@@ -34,14 +36,11 @@ def mrjobworker(request_id):
 		url=server_url+"api/jobupdation"
 		headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
 		r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
-        url=server_url+"api/jobupdation"
-        headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
-		r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
 	except Exception as e:
-             exc_type, exc_obj, exc_tb = sys.exc_info()
-             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-             my_logger.error(exc_type)
-             my_logger.error(fname)
-             my_logger.error(exc_tb.tb_lineno)
+			 exc_type, exc_obj, exc_tb = sys.exc_info()
+			 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+			 my_logger.error(exc_type)
+			 my_logger.error(fname)
+			 my_logger.error(exc_tb.tb_lineno)
 	finally:
 		db_session.close()

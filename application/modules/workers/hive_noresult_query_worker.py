@@ -22,7 +22,7 @@ def hiveNoResultQueryWorker(query_database,hive_query,hive_request_id,customer_i
     8: "TIMEDOUT",
 }
     try:
-        print "in hive no result query worker"
+        my_logger.info("in hive no result query worker")
 
         hive_query_decode = hive_query.decode('base64', 'strict')
 
@@ -41,7 +41,8 @@ def hiveNoResultQueryWorker(query_database,hive_query,hive_request_id,customer_i
             db_session.commit()
             hive_result_data['message'] = "query executed successfully"
         elif hive_result == 1 or hive_result == 7:
-            print hive_result, type(hive_result),"jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"
+            my_logger.info(hive_result)
+            my_logger.info(type(hive_result))
             query_status = TblHiveQueryStatus(uid_hive_request_id=hive_request_id,
                                                   var_query_status=status_dict[hive_result],
                                                   ts_status_datetime=datetime.now(),
@@ -64,12 +65,12 @@ def hiveNoResultQueryWorker(query_database,hive_query,hive_request_id,customer_i
 
         url = server_url + 'hivequeryoutput'
         data = json.dumps(hive_result_data)
-        print data
+        my_logger.info(data)
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=data, headers=headers)
-        print 'done'
+        my_logger.info('done')
 
-        print hive_result_data
+        my_logger.info(hive_result_data)
 
     except Exception as e :
 

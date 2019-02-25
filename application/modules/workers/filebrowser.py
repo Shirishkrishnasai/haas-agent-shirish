@@ -3,6 +3,8 @@ import json
 from kafka import KafkaConsumer
 from kafka import KafkaProducer
 from application.configfile import agentinfo_path,kafka_bootstrap_server,kafka_api_version
+from application.common.loggerfile import my_logger
+
 def webhdfs():
     try:
         #info = open(agentinfo_path, "r")
@@ -13,26 +15,26 @@ def webhdfs():
         consumer = KafkaConsumer(bootstrap_servers=kafka_bootstrap_server)
         consumer.subscribe(pattern='filebrowsing*')
         for message in consumer:
-            print 'hiiiiiiiiiiiiiiiiiiiiiiii'
+            my_logger.info('hiiiiiiiiiiiiiiiiiiiiiiii')
             hdfspath = message.value
-            print type(hdfspath)
+            my_logger.info(type(hdfspath))
             data = hdfspath.replace("'", '"')
-            #print data,'dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+            #my_logger.info(data)
             message = json.loads(data)
-            #print message ,type(message) ,'message',message.keys()
+            #my_logger.info(message ,type(message) ,'message',message.keys()
             filename=message["filename"]
             clusterid=message['cluster_id']
             customerid=message['customer_id']
             agentid=message['agent_id']
             timestamp=message['timestamp']
             namenodeip=message['namenode_ip']
-            print agentid
+            my_logger.info(agentid)
             if agentid==agent_id:
-                print agentid
+                my_logger.info(agentid)
                 response = requests.get(url="http://"+namenodeip+":50070/webhdfs/v1/"+filename+"?op=LISTSTATUS")
                 result= response.text
                 result=json.loads(result)
-                #print result
+                #my_logger.info(result
                 file_list=result["FileStatuses"]["FileStatus"]
                 data=[]
                 for file in file_list:
@@ -41,7 +43,7 @@ def webhdfs():
                     files_data["filepath"]=str(file["pathSuffix"])
                     files_data["type"]=str(file["type"])
                     data.append(files_data)
-                #print data,'daaaaaaaaaaaataaaaaaaaaaaaaaaaa'
+                #my_logger.info(data,'daaaaaaaaaaaataaaaaaaaaaaaaaaaa'
 
                 # producer part
                 producer=KafkaProducer(bootstrap_servers=kafka_bootstrap_server)
@@ -57,6 +59,6 @@ def webhdfs():
                 kafkatopic = kafkatopic.decode('utf-8')
                 producer.send(kafkatopic, str(status_dict))
                 producer.flush()
-                print 'flush'
+                my_logger.info('flush')
     except Exception as e:
-        print e.message
+        my_logger.info(e.message)

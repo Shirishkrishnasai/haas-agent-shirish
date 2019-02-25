@@ -1,6 +1,7 @@
 import requests
 # from yarn_api_client import ApplicationMaster, HistoryServer, NodeManager, ResourceManager
 import json, time
+from application.common.loggerfile import my_logger
 
 
 class HDFSManager():
@@ -12,15 +13,17 @@ class HDFSManager():
 
     def __makeGet(self, url="", data=None, json_data=None):
 
-        print "calling ", url
+        my_logger.info("calling ")
+        my_logger.info(url)
         resp = requests.get(url, headers={"Content-type": "application/json"})
         data = json.loads(resp.content)
         return data
 
     def __makePost(self, url="", data=None, json_data=None, files=None):
-        print "calling ", url
+        my_logger.info("calling ")
+        my_logger.info(url)
         resp = requests.put(url, files=files, headers={"Content-type": "application/json"})
-        print resp.reason
+        my_logger.info(resp.reason)
         if (resp.status_code >= 200 and resp.status_code < 300):
             if resp.content:
                 data = json.loads(resp.content)
@@ -83,7 +86,7 @@ class MapRedResourceManager():
         self.maxJvm = 512
         self.mapredCommand = "/opt/hadoop/bin/hadoop jar {} {}"
     def _submitJob(self, jobJson=None):
-        print jobJson
+        my_logger.info(jobJson)
         self.__makePost(self.getApiUrl(self.__getAppUrl()), json_data=jobJson)
 	return jobJson
     def submitJob(self, location="localhost", port=None,job_parameters=None, filename=None, jar_path=None, input=None, output=None, noofbytes=None, type="mapr", **kwargs):
@@ -100,18 +103,18 @@ class MapRedResourceManager():
         """
 
         api_endpoint = 'http://{}:{}{}/new-application'.format(self.address, self.port, self.__getAppUrl())
-        print api_endpoint,"api"
+        my_logger.info(api_endpoint)
 
         appid = requests.post(api_endpoint, None, None, headers=self.__getHeaders());
 
         new_app_response = json.loads(appid.content)
         application_id = new_app_response['application-id']
-	print new_app_response,"applicationcontent"
+	my_logger.info(new_app_response)
         resources = {
             "memory": (1024 if not kwargs.get("memory") else kwargs.get("memory")),
             "vCores": (1 if not kwargs.get("vcores") else kwargs.get("vcores"))
         }
-        print resources,'resources'
+        my_logger.info(resources)
         environment = {
             "entry":
                 [
@@ -152,11 +155,11 @@ class MapRedResourceManager():
             "application-type": "YARN",
             "keep-containers-across-application-attempts": 'true'
         }
-        print (mapRedJob)
+        my_logger.info(mapRedJob)
       #  time.sleep(10)
 
-        print self._submitJob(jobJson=mapRedJob),111
-	print  new_app_response['application-id']
+        my_logger.info(self._submitJob(jobJson=mapRedJob))
+	my_logger.info(new_app_response['application-id'])
         return new_app_response['application-id']
 
     def prepareParams(self):
@@ -192,7 +195,7 @@ class MapRedResourceManager():
     """
 
     def __makePost(self, url="", data=None, json_data=None ,params=None):
-        print "calling ", url
+        my_logger.info(url)
         resp = requests.post(url, data, json_data, headers={"Content-type": "application/json"})
         if (resp.status_code >= 200 and resp.status_code < 300):
             if resp.content:
@@ -204,7 +207,7 @@ class MapRedResourceManager():
                                                                                                 resp.content)}
 
     def __makeGet(self, url="", data=None, json_data=None):
-        print "calling ", url
+        my_logger.info(url)
         resp = requests.get(url, headers={"Content-type": "application/json"})
         data = json.loads(resp.content)
         return data

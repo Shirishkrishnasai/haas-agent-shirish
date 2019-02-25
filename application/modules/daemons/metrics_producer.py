@@ -23,24 +23,24 @@ def kafkaMetricsProducer():
     while True:
         try:
 
-            my_logger.debug("Getting metrics and publishing....")
+            my_logger.info("Getting metrics and publishing....")
             producer = KafkaProducer(bootstrap_servers=[kafka_server_url])
             kafka_topic = "metrics_" + customer_id + "_" + cluster_id
-            my_logger.debug(kafka_topic)
+            my_logger.info(kafka_topic)
             kafkatopic = kafka_topic.decode('utf-8')
-            print "getting ram_metrics"
+            my_logger.info("getting ram_metrics")
             ram_metrics = ramMetrics()
-            print "getting cpu metrics"
+            my_logger.info("getting cpu metrics")
             cpu_metrics = cpuMetrics()
-            print "getting network metrics"
+            my_logger.info("getting network metrics")
             network_metrics = network()
-            print "getting storage metrics"
+            my_logger.info("getting storage metrics")
             storage_metrics = storage()
             disk_metrics = disk()
 
             metrics_list = []
             metrics_list.extend((ram_metrics, cpu_metrics, network_metrics, storage_metrics, disk_metrics))
-            my_logger.debug(metrics_list)
+            my_logger.info(metrics_list)
             metrics_data = {}
             metrics_data['event_type'] = "metrics"
             date_time = datetime.datetime.now()
@@ -54,7 +54,7 @@ def kafkaMetricsProducer():
             metrics_data['payload'] = metrics_list
             producer.send(kafkatopic, str(metrics_data))
             producer.flush()
-            print "metricss produced"
+            my_logger.info("metricss produced")
         except Exception as e:
             #my_logger.error("Some error caught", e.message)
             return e

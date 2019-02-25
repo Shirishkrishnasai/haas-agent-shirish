@@ -6,41 +6,42 @@ import requests
 from azure.storage.file import FileService
 logging.basicConfig()
 from application.configfile import server_url, agentinfo_path, agentregistration_connection, azure_credentials_url
+from application.common.loggerfile import my_logger
 
 
 def agentregisterfunc():
     try:
-        print 'in agent register daemon'
+        my_logger.info('in agent register daemon')
         agent_data = open(agentinfo_path, "r")
         content = agent_data.read()
-        print content, 'connnn'
+        my_logger.info(content)
         agent_data.close()
         data_req = json.loads(content, 'utf-8')
         cluster_id = str(data_req['cluster_id'])
-        print cluster_id, 'clusssss'
+        my_logger.info(cluster_id)
         customer_id = str(data_req['customer_id'])
         url = server_url + agentregistration_connection
         data = json.dumps(data_req)
-        print data
+        my_logger.info(data)
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=data, headers=headers)
-        print 'done'
+        my_logger.info('done')
 
         azure_credential_url = server_url + azure_credentials_url + customer_id
-        #print azure_credential_url
+        #my_logger.info(azure_credential_url
         get_azure_credetials = requests.get(azure_credential_url)
-        print get_azure_credetials, 'gettttttttttttt'
+        my_logger.info(get_azure_credetials)
         dict_azure_credentials = get_azure_credetials.json()
-        print dict_azure_credentials, 'dictttt'
+        my_logger.info(dict_azure_credentials)
         azure_account_name = dict_azure_credentials['account_name']
         azure_account_key = dict_azure_credentials['key']
         azure_share_name = cluster_id
-        print azure_share_name, 'shareeee'
+        my_logger.info(azure_share_name)
         file_service = FileService(account_name=azure_account_name, account_key=azure_account_key)
 
         if file_service.exists(azure_share_name) == True:
             # Script details
-            print 'inside'
+            my_logger.info('inside')
             script_path = "/opt/scripts"
             script_name = 'azure-mount-share.sh'
             script_arguments = azure_account_name + ' ' + azure_account_key + ' ' + azure_share_name
@@ -50,4 +51,4 @@ def agentregisterfunc():
         else:
             pass
     except Exception as e:
-         print e.message
+         my_logger.info(e.message)

@@ -15,21 +15,21 @@ def agentdaemon():
         session = scoped_session(session_factory)
     # getting agentid from cloudinnit file
         agent_id, customer_id, cluster_id = loadconfig()
-        print "in agent daemon program"
+        my_logger.info("in agent daemon program")
     # calling hgmanager for its tasks
         url=server_url+'hgmanager/'+agent_id
-        print url, " this agent daemon just called the hgmanager apiiiiiii"
+        my_logger.info(url)
         r = requests.get(url)
         req_data = r.json()
-        print (req_data)
+        my_logger.info(req_data)
         if req_data == 'null' :
-            print "no tasks "
+            my_logger.info("no tasks ")
     # posting data in tbl_agent_worker_task_mapping
         else :
             for data in req_data:
-                    print data
+                    my_logger.info(data)
                     task_id = str(data['task_id'])
-                    print task_id
+                    my_logger.info(task_id)
                     payload_id=str(data['payload_id'])
                     worker_version_path=str(data['worker_path'])
                     worker_version=str(data['worker_version'])
@@ -43,7 +43,7 @@ def agentdaemon():
                                                var_task_status="INITIALISED")
                     session.add(data)
                     session.commit()
-                    print  "agent daemon committed to database. will run in next minute........................meanwhile check the table"
+                    my_logger.info("agent daemon committed to database. will run in next minute........................meanwhile check the table")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

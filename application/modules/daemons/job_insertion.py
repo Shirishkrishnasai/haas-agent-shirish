@@ -9,13 +9,13 @@ from application.common.loggerfile import my_logger
 import sys,os
 def insertjob():
     try:
-        print "in"
+        my_logger.info("in")
         session = scoped_session(session_factory)
         url = server_url + 'api/mrjob'
 
         r = requests.get(url)
         req_data = r.json()
-        print req_data
+        my_logger.info(req_data)
         for data in req_data['message']:
             insert_mr_job_info=TblMrJobInfo(var_resourcemanager_ip=data['resourcemanager_ip'],
                                             uid_request_id=data['request_id'],
@@ -28,9 +28,9 @@ def insertjob():
                                             var_job_diagnostic_status='CREATED')
             session.add(insert_mr_job_info)
             session.commit()
-            print "out "
+            my_logger.info("out ")
             mrjobworker(data['request_id'])
-            print "worker finished"
+            my_logger.info("worker finished")
     except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
