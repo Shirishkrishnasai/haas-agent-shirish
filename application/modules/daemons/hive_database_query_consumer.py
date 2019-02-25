@@ -11,7 +11,7 @@ from application.common.load_config import loadconfig
 import time
 
 def hiveDatabaseQueryConsumer():
-    my_logger.debug('in hive query consumer')
+    my_logger.info('in hive query consumer')
     agent_id, customer_id, cluster_id = loadconfig()
     consumer = KafkaConsumer(bootstrap_servers=[kafka_server_url], group_id="hivedatabasequery"+str(agent_id))
     consumer.subscribe(pattern='hivedatabasequery*')
@@ -23,33 +23,33 @@ def hiveDatabaseQueryConsumer():
 
                 for messageValues in topicMesages[0]:
 
-                    print "in first for loop"
+                    my_logger.info("in first for loop")
                     consumer_data = message.value
-                    # print "..........................",consumer_data
+                    # my_logger.info("..........................",consumer_data
                     data = consumer_data.replace("'", '"')
                     query_data = json.loads(data)
-                    print 'hellllllllllloooooooooooooooooo'
-                    print query_data
+                    my_logger.info('hellllllllllloooooooooooooooooo')
+                    my_logger.info(query_data)
                     hiveClient = HiveQuery(hive_connection, 10000, 'default')
-                    print "hhhhhhhhhhhhhhhhhhheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+                    my_logger.info("hhhhhhhhhhhhhhhhhhheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
                     explain_result = hiveClient.runQuery("show databases")
-                    print 'starrrrrrrrrrrrrrttttttttttttt', explain_result
-                    print type(explain_result)
+                    my_logger.info(explain_result)
+                    my_logger.info(type(explain_result))
                     names_list = []
                     database_result = {}
                     for value in explain_result['output']:
-                        print str(value[0])
+                        my_logger.info(str(value[0]))
                         names_list.append(str(value[0]))
-                    print names_list
+                    my_logger.info(names_list)
                     key = "database_names"
                     database_result[key] = names_list
-                    print database_result
+                    my_logger.info(database_result)
                     producer = KafkaProducer(bootstrap_servers=[kafka_server_url])
                     kafkatopic = "hivedatabaseresult_" + customer_id + "_" + cluster_id
                     kafkatopic = kafkatopic.decode('utf-8')
                     producer.send(kafkatopic, str(database_result))
                     producer.flush()
-                    print "produced"
+                    my_logger.info("produced")
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

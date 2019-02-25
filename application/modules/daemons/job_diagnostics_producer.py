@@ -3,8 +3,10 @@ from application import session_factory
 from application.models.models import TblMrJobInfo
 from apscheduler.schedulers.background import BackgroundScheduler
 from application.configfile import  server_url
-import json
+import json, sys, os
 import requests
+from application.common.loggerfile import my_logger
+
 
 def jobdiagnostics():
     try:

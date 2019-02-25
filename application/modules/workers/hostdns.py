@@ -3,22 +3,24 @@ from bson.objectid import ObjectId
 import pymongo
 import sys
 from application.configfile import mongo_conn_string
+from application.common.loggerfile import my_logger
+
 payloadid=sys.argv
 object_id=payloadid[2]
 def host_agent(objectid):
     myclient = pymongo.MongoClient(mongo_conn_string)
     mydb = myclient["haas"]
-    print(objectid)
+    my_logger.info(objectid)
     querystatment=mydb.hostdns.find_one({"_id" : ObjectId(objectid)})
     #host=open("hosts","w")
-    print(querystatment["content"])
+    my_logger.info(querystatment["content"])
     #host.write("%s" % querystatment["content"])
     #host.close()
-    print(querystatment["content"],"123")
+    my_logger.info(querystatment["content"],"123")
     statement='echo "'+querystatment["content"]+'" >> /etc/hosts'
-    print statement
+    my_logger.info(statement)
     execute=os.system(statement)
-    print execute
+    my_logger.info(execute)
 host_agent(objectid=object_id)
 
 

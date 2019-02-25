@@ -1,6 +1,6 @@
 import json,requests,multiprocessing
 from apscheduler.schedulers.background import BackgroundScheduler
-
+import sys, os
 from application import session_factory
 from application.common.loggerfile import my_logger
 from application.configfile import  server_url
@@ -15,13 +15,13 @@ def hiveQueryConsumer():
     #try:
             #agent_id = 'c188975e-251b-11e9-8b29-000d3af26ae3'
             url = server_url+"hivequery/"+agent_id
-            print url
+            my_logger.info(url)
             headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
             api_response = requests.get(url, headers = headers).json()
-            print json.dumps(api_response)
-            print 'done'
+            my_logger.info(json.dumps(api_response))
+            my_logger.info('done')
             if api_response == 404:
-                print "no messages for now"
+                my_logger.info("no messages for now")
                 pass
             else:
 
@@ -65,7 +65,7 @@ def hiveQueryConsumer():
                                 "no result for this query...probably a ddl query..........please be patient")
                             noresult_query_process.join()
                             my_logger.info("ddl query process done........")
-                        print 'ok'
+                        my_logger.info('ok')
                         db_session.close()
 
 

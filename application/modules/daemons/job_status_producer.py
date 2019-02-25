@@ -16,7 +16,7 @@ def jobstatus():
                                      TblMrJobInfo.var_job_status,TblMrJobInfo.uid_customer_id,
                                      TblMrJobInfo.uid_cluster_id,TblMrJobInfo.var_resourcemanager_ip).\
             filter(TblMrJobInfo.var_job_status !='FAILED',TblMrJobInfo.var_job_status != 'FINISHED').all()
-	    job_list=[]
+        job_list=[]
         for job_details in job_info_query:
             appnumber=job_details[1].split("_")
             appincrement=int(appnumber[-1])+1
@@ -24,10 +24,10 @@ def jobstatus():
             replaceappid=job_details[1].replace(str(appnumber[-1]),str(applicationid))
             jobstatus_statement="http://"+job_details[5]+":8088/ws/v1/cluster/apps/" +replaceappid+"/state"
             token=requests.get(jobstatus_statement)
-            print token
-            print type(token)
+            my_logger.info(token)
+            my_logger.info(type(token))
             jobstatus_dict=token.json()
-            print jobstatus_dict
+            my_logger.info(jobstatus_dict)
             application_data = {"customer_id":job_details[3],"status": jobstatus_dict["state"], "request_id": job_details[0], "application_id": job_details[1]}
             job_list.append(application_data)
             update_jobinfo_query = session.query(TblMrJobInfo).filter(TblMrJobInfo.uid_request_id==job_details[0],TblMrJobInfo.var_application_id==job_details[1])
