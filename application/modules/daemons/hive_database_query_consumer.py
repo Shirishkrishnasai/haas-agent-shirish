@@ -4,7 +4,7 @@ import sys
 
 from application.common.hive import HiveQuery
 from application.common.loggerfile import my_logger
-from application.configfile import agentinfo_path, kafka_server_url, hive_connection
+from application.configfile import  kafka_server_url, hive_connection
 from kafka import KafkaConsumer
 from kafka import KafkaProducer
 from application.common.load_config import loadconfig

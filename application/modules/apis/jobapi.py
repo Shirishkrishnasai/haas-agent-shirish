@@ -1,5 +1,4 @@
 import requests
-# from yarn_api_client import ApplicationMaster, HistoryServer, NodeManager, ResourceManager
 import json, time
 from flask import Blueprint
 

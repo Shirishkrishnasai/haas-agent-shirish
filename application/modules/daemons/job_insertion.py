@@ -1,5 +1,3 @@
-from kafka import KafkaConsumer
-from application.configfile import kafka_bootstrap_server
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblMrJobInfo
@@ -8,7 +6,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from application.configfile import server_url
 import requests
 from application.common.loggerfile import my_logger
-import json
 import sys,os
 def insertjob():
     try:
@@ -40,7 +37,8 @@ def insertjob():
             my_logger.error(exc_type)
             my_logger.error(fname)
             my_logger.error(exc_tb.tb_lineno)
-
+    finally:
+        session.close()
 
 def jobinsertionscheduler():
     scheduler = BackgroundScheduler()
