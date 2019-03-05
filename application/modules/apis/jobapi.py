@@ -1,7 +1,7 @@
 import requests
+# from yarn_api_client import ApplicationMaster, HistoryServer, NodeManager, ResourceManager
 import json, time
 from flask import Blueprint
-from application.common.loggerfile import my_logger
 
 mapredjob=Blueprint("mapredjob",__name__)
 @mapredjob.route('/job',methods=['GET'])
@@ -23,18 +23,18 @@ def submitJob(address='192.168.100.169',location="localhost", port=5000, jar_pat
         """
 #	geturl='http://{}:{}{}?user_name=hadoop'.format(address,port,'')
         api_endpoint = 'http://{}:{}{}/new-application?user_name=hadoop'.format(address, port,'')
-        my_logger.info(api_endpoint)
+        print api_endpoint\
 
         appid = requests.post(api_endpoint, None, None, headers = {"Content-type": "application/json"});
 
         new_app_response = json.loads(appid.content)
         application_id = new_app_response['application-id']
-        my_logger.info(new_app_response)
+	print new_app_response
         resources = {
             "memory": (1024 if not kwargs.get("memory") else kwargs.get("memory")),
             "vCores": (1 if not kwargs.get("vcores") else kwargs.get("vcores"))
         }
-        my_logger.info(resources)
+        print resources
         environment = {
             "entry":
                 [
@@ -71,7 +71,7 @@ def submitJob(address='192.168.100.169',location="localhost", port=5000, jar_pat
             "application-type": "MAPREDUCE",
             "keep-containers-across-application-attempts": 'false'
         }
-        my_logger.info(mapRedJob)
+        print (mapRedJob)
         time.sleep(10)
         return new_app_response['application-id']
 

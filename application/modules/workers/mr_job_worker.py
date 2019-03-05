@@ -1,15 +1,23 @@
 import requests
-import json, sys ,os
-from application.configfile import server_url
+import shutil
+import json
+import tarfile
+import os
+from application.configfile import agentinfo_path,kafka_bootstrap_server, kafka_api_version,download_url,server_url
+import gzip
+#import filetype
+#import conf
 from application.common.job_management import MapRedResourceManager
 import time
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblMrJobInfo
+import urllib
+import  os,pwd,sys
+import hashlib
 from application.common.loggerfile import my_logger
-
 def mrjobworker(request_id):
-	try:
+	#try:
 		db_session = scoped_session(session_factory)
 		maprjob_data = db_session.query(TblMrJobInfo.var_resourcemanager_ip,TblMrJobInfo.uid_customer_id,TblMrJobInfo.uid_cluster_id,TblMrJobInfo.var_file_name,TblMrJobInfo.var_job_parameters).filter(TblMrJobInfo.uid_request_id == request_id).all()
 		time_stamp=str(int(round(time.time() * 1000)))
@@ -20,9 +28,9 @@ def mrjobworker(request_id):
 		job_parameters =maprjob_data[0][4]
 		mr_parameters=job_parameters.replace(",","  ")
 		mapred = MapRedResourceManager(address=IPAddr, port=8088)
-		my_logger.info(IPAddr)
-		application_id=mapred.submitJob(jar_path="/opt/mnt/azurefileshare/sampledir/"+file_name,job_parameters=mr_parameters)
-		my_logger.info(application_id)
+		print IPAddr
+		application_id=mapred.submitJob(jar_path="/opt/mnt/azurefileshare/mapreduce/"+file_name,job_parameters=mr_parameters)
+		print application_id
 		object = db_session.query(TblMrJobInfo).filter(TblMrJobInfo.uid_request_id == request_id)
 		object.update({"var_application_id": application_id})
 		db_session.commit()
@@ -36,11 +44,13 @@ def mrjobworker(request_id):
 		url=server_url+"api/jobupdation"
 		headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
 		r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
-	except Exception as e:
-			 exc_type, exc_obj, exc_tb = sys.exc_info()
-			 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			 my_logger.error(exc_type)
-			 my_logger.error(fname)
-			 my_logger.error(exc_tb.tb_lineno)
-	finally:
-		db_session.close()
+		url=server_url+"api/jobupdation"
+		headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
+		r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
+	# except Exception as e:
+    #         exc_type, exc_obj, exc_tb = sys.exc_info()
+    #         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    #         my_logger.error(exc_type)
+    #         my_logger.error(fname)
+    #         my_logger.error(exc_tb.tb_lineno)
+	#
