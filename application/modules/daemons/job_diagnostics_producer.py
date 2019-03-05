@@ -1,12 +1,14 @@
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblMrJobInfo
+import subprocess
 from apscheduler.schedulers.background import BackgroundScheduler
-from application.configfile import  server_url
-import json, sys, os
+from application.configfile import kafka_bootstrap_server, kafka_api_version, server_url
+from kafka import KafkaProducer
+import json
 import requests
 from application.common.loggerfile import my_logger
-
+import os,sys
 
 def jobdiagnostics():
     try:
@@ -37,12 +39,12 @@ def jobdiagnostics():
     except Exception as e:
          exc_type, exc_obj, exc_tb = sys.exc_info()
          fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-
+    
          my_logger.error(exc_type)
          my_logger.error(fname)
          my_logger.error(exc_tb.tb_lineno)
     finally:
-        session.close()
+	 session.close()
 def jobdiagnosticsscheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(jobdiagnostics, 'cron', second='*/20')

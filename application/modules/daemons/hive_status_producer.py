@@ -1,8 +1,10 @@
+import datetime
 import time
+import requests
 import json
 from kafka import KafkaProducer
 import logging
-import sys
+import sys,os
 logging.basicConfig()
 import sqlite3
 from application.configfile import kafka_server_url, agentinfo_path
@@ -28,9 +30,9 @@ def hiveQueryStatus():
 
 
             kafka_topic = "hivequerystatus_" + customer_id + "_" + cluster_id
-            my_logger.info(kafka_topic)
+            my_logger.debug(kafka_topic)
             kafkatopic = kafka_topic.decode('utf-8')
-            my_logger.info(kafkatopic)
+            my_logger.debug(kafkatopic)
             query_status_data = {}
             query_status_data['event_type'] = "query_status"
 
@@ -49,32 +51,33 @@ def hiveQueryStatus():
 
 
 
-                my_logger.info("print all the data that has to be given from kafka hiveeeee query status producer")
-                my_logger.info(query_status_data)
+                my_logger.debug("print all the data that has to be given from kafka hiveeeee query status producer")
+                my_logger.debug(query_status_data)
 
                 producer.send(kafkatopic, str(query_status_data))
                 producer.flush()
-                my_logger.info("doneeeeeeee-doneeeeeeeeeeee-londonnnnnnnnnnnnn")
-                my_logger.info("done for agent side hive query status producer to send data through kafka pipeline")
+                my_logger.debug("doneeeeeeee-doneeeeeeeeeeee-londonnnnnnnnnnnnn")
+                my_logger.debug("done for agent side hive query status producer to send data through kafka pipeline")
 
                 update_querystatus_flag = db_session.query(TblHiveQueryStatus).filter(
                     TblHiveQueryStatus.uid_hive_request_id == each_row[0])
                 update_querystatus_flag.update({"bool_flag": 1})
                 db_session.commit()
+                db_session.close()
 
-                my_logger.info("everything doneeeeeeeeeeeeeeeeeeeeeeeeeee")
+                my_logger.debug("everything doneeeeeeeeeeeeeeeeeeeeeeeeeee")
 
             producer.close()
         except sqlite3.Error as er:
-            my_logger.info(er)
-            my_logger.info(sys.exc_info()[0])
+            my_logger.debug(er)
+            my_logger.debug(sys.exc_info()[0])
             #return 'sqlite error'
         except Exception as e:
-            my_logger.info(e)
-            my_logger.info(sys.exc_info()[0])
+            print  "Some this went wrong", sys.exc_info()[0]
+            my_logger.debug(e)
+            my_logger.debug(sys.exc_info()[0])
             #return e.message
-        finally:
-            db_session.close()
+        #producer.close()
         time.sleep(20)
 
 

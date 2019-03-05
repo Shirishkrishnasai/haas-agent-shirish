@@ -5,8 +5,8 @@ from sqlalchemy.orm import scoped_session
 from application.models.models import TblAgentWorkerTaskMapping
 logging.basicConfig()
 from apscheduler.schedulers.background import BackgroundScheduler
-from application import  session_factory
-from application.configfile import server_url
+from application import sqlite_string, session_factory
+from application.configfile import server_url,agentinfo_path
 from application.common.loggerfile import my_logger
 
 def agentdaemon():
@@ -15,21 +15,21 @@ def agentdaemon():
         session = scoped_session(session_factory)
     # getting agentid from cloudinnit file
         agent_id, customer_id, cluster_id = loadconfig()
-        my_logger.info("in agent daemon program")
+        print "in agent daemon program"
     # calling hgmanager for its tasks
         url=server_url+'hgmanager/'+agent_id
-        my_logger.info(url)
+        print url, " this agent daemon just called the hgmanager apiiiiiii"
         r = requests.get(url)
         req_data = r.json()
-        my_logger.info(req_data)
+        print (req_data)
         if req_data == 'null' :
-            my_logger.info("no tasks ")
+            print "no tasks "
     # posting data in tbl_agent_worker_task_mapping
         else :
             for data in req_data:
-                    my_logger.info(data)
+                    print data
                     task_id = str(data['task_id'])
-                    my_logger.info(task_id)
+                    print task_id
                     payload_id=str(data['payload_id'])
                     worker_version_path=str(data['worker_path'])
                     worker_version=str(data['worker_version'])
@@ -43,7 +43,7 @@ def agentdaemon():
                                                var_task_status="INITIALISED")
                     session.add(data)
                     session.commit()
-                    my_logger.info("agent daemon committed to database. will run in next minute........................meanwhile check the table")
+                    print  "agent daemon committed to database. will run in next minute........................meanwhile check the table"
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

@@ -1,12 +1,14 @@
-import json,requests,multiprocessing
+import json,requests,multiprocessing,os,sys,time
 from apscheduler.schedulers.background import BackgroundScheduler
-import sys, os
+
 from application import session_factory
 from application.common.loggerfile import my_logger
-from application.configfile import  server_url
+from application.configfile import agentinfo_path, server_url
 from application.modules.workers.hive_noresult_query_worker import hiveNoResultQueryWorker
 from application.modules.workers.hive_result_query_worker import hiveResultQueryWorker
+# from application.modules.daemons.hive_explainquery_worker import hiveExplain
 from application.modules.workers.hive_selectquery_worker import hiveSelectQueryWorker
+from kafka import KafkaConsumer
 from sqlalchemy.orm import scoped_session
 from application.common.load_config import loadconfig
 def hiveQueryConsumer():
@@ -15,13 +17,13 @@ def hiveQueryConsumer():
     #try:
             #agent_id = 'c188975e-251b-11e9-8b29-000d3af26ae3'
             url = server_url+"hivequery/"+agent_id
-            my_logger.info(url)
+            print url
             headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
             api_response = requests.get(url, headers = headers).json()
-            my_logger.info(json.dumps(api_response))
-            my_logger.info('done')
+            print json.dumps(api_response)
+            print 'done'
             if api_response == 404:
-                my_logger.info("no messages for now")
+                print "no messages for now"
                 pass
             else:
 
@@ -65,7 +67,7 @@ def hiveQueryConsumer():
                                 "no result for this query...probably a ddl query..........please be patient")
                             noresult_query_process.join()
                             my_logger.info("ddl query process done........")
-                        my_logger.info('ok')
+                        print 'ok'
                         db_session.close()
 
 

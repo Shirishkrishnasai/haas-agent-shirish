@@ -2,7 +2,6 @@ from pyhive import hive
 from TCLIService.ttypes import TOperationState
 import  logging
 import time
-from application.common.loggerfile import my_logger
 
 class HiveQuery:
 
@@ -22,20 +21,18 @@ class HiveQuery:
             if conn:
                 messages=[]
                 cursor = conn.cursor()
-                my_logger.info("tilllll hereeeeeeeeeee doneeeeeeeee")
+                print "tilllll hereeeeeeeeeee doneeeeeeeee"
                 cursor.execute(query, async=True)
 
-                my_logger.info("this is not doneeeeeeeee what tooooooooooo dooooooooooo")
+                print "this is not doneeeeeeeee what tooooooooooo dooooooooooo"
                 status = cursor.poll().operationState
-                my_logger.info("the initial status")
-                my_logger.info(status)
+                print "the initial status",status
                 while status in (TOperationState.INITIALIZED_STATE, TOperationState.RUNNING_STATE):
-                    my_logger.info("the status you wanted")
-                    my_logger.info(status)
+                    print "the status you wanted",status
                     #logs = cursor.fetch_logs()
                     #for message in logs:
                      #   messages.append(message)
-                    #my_logger.info("class messagessssssssssssssssssss",messages
+                    #print "class messagessssssssssssssssssss",messages
                     #time.sleep(2)
                     status = cursor.poll().operationState
 
@@ -43,14 +40,13 @@ class HiveQuery:
 
 
 
-                my_logger.info("now this is hive query status")
-                my_logger.info(status)
+                print "now this is hive query status",status
 
 
                 if status==TOperationState.FINISHED_STATE:
-                    my_logger.info('result existsssssssssssssssssss')
+                    print 'result existsssssssssssssssssss'
                 else:
-                    my_logger.info('noooooooooo resulttttttttt setttttttttttt')
+                    print 'noooooooooo resulttttttttt setttttttttttt'
 
 
 
@@ -62,7 +58,7 @@ class HiveQuery:
                 return result_dict
 
         except Exception as e:
-            my_logger.info(e.message)
+            print e.message
             return e.__str__()
 
 
@@ -77,14 +73,13 @@ class HiveQuery:
                 cursor = conn.cursor()
                 cursor.execute(query, async=True)
                 status = cursor.poll().operationState
-                my_logger.info("the initial status")
-                my_logger.info(status)
+                print "the initial status",status
                 while status in (TOperationState.INITIALIZED_STATE, TOperationState.RUNNING_STATE):
-                    #my_logger.info("the status you wanted",status
+                    #print "the status you wanted",status
                     #logs = cursor.fetch_logs()
                     #for message in logs:
                      #   messages.append(message)
-                    #my_logger.info("class messagessssssssssssssssssss",messages
+                    #print "class messagessssssssssssssssssss",messages
                     #time.sleep(2)
                     status = cursor.poll().operationState
                 return status

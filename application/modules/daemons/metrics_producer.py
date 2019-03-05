@@ -9,6 +9,7 @@ from application.modules.workers.cpu_metric_worker import cpuMetrics
 from application.modules.workers.network_metric_worker import network
 from application.modules.workers.storage_metric_worker import storage
 from application.modules.workers.disk_metric_worker import disk
+#from application.common.metrics_updation import metricSubscriber
 from application.common.loggerfile import my_logger
 
 
@@ -23,24 +24,24 @@ def kafkaMetricsProducer():
     while True:
         try:
 
-            my_logger.info("Getting metrics and publishing....")
+            my_logger.debug("Getting metrics and publishing....")
             producer = KafkaProducer(bootstrap_servers=[kafka_server_url])
             kafka_topic = "metrics_" + customer_id + "_" + cluster_id
-            my_logger.info(kafka_topic)
+            my_logger.debug(kafka_topic)
             kafkatopic = kafka_topic.decode('utf-8')
-            my_logger.info("getting ram_metrics")
+            print "getting ram_metrics"
             ram_metrics = ramMetrics()
-            my_logger.info("getting cpu metrics")
+            print "getting cpu metrics"
             cpu_metrics = cpuMetrics()
-            my_logger.info("getting network metrics")
+            print "getting network metrics"
             network_metrics = network()
-            my_logger.info("getting storage metrics")
+            print "getting storage metrics"
             storage_metrics = storage()
             disk_metrics = disk()
 
             metrics_list = []
             metrics_list.extend((ram_metrics, cpu_metrics, network_metrics, storage_metrics, disk_metrics))
-            my_logger.info(metrics_list)
+            my_logger.debug(metrics_list)
             metrics_data = {}
             metrics_data['event_type'] = "metrics"
             date_time = datetime.datetime.now()
@@ -54,7 +55,7 @@ def kafkaMetricsProducer():
             metrics_data['payload'] = metrics_list
             producer.send(kafkatopic, str(metrics_data))
             producer.flush()
-            my_logger.info("metricss produced")
+            print "metricss produced"
         except Exception as e:
             #my_logger.error("Some error caught", e.message)
             return e

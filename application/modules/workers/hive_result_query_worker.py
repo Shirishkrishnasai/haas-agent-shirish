@@ -1,7 +1,8 @@
 import requests
-import json, sys ,os
+import json
 
 from datetime import datetime
+from application.common.loggerfile import my_logger
 
 from application.configfile import hive_connection, server_url
 
@@ -9,14 +10,13 @@ from application.common.hive import HiveQuery
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblHiveQueryStatus
-from application.common.loggerfile import my_logger
 
 
 
 
 def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,cluster_id):
 
-    status_dict = {
+        status_dict = {
             0: "INITIALIZED",
             1: "RUNNING",
             2: "FINISHED",
@@ -27,8 +27,8 @@ def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,
             7: "PENDING",
             8: "TIMEDOUT",
         }
-    try:
-        my_logger.info("in hive  result query worker")
+    #try:
+        print "in hive  result query worker"
         hive_query_decode = hive_query.decode('base64', 'strict')
 
         hiveClient = HiveQuery(hive_connection, 10000, query_database)
@@ -36,7 +36,7 @@ def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,
         db_session = scoped_session(session_factory)
         hive_result_data = {}
         hive_result = hiveClient.runQuery(hive_query_decode)
-        my_logger.info(hive_result)
+        print hive_result
 
         if type(hive_result) == dict:
             if hive_result['status'] == 2:
@@ -47,15 +47,13 @@ def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,
                 db_session.add(hive_status)
                 db_session.commit()
                 string_tuple_list = json.dumps([list(map(str, eachTuple)) for eachTuple in hive_result['output']])
-                my_logger.info(string_tuple_list)
-                my_logger.info(type(string_tuple_list))
+                print string_tuple_list,type(string_tuple_list),"huuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
 
                 hive_result_data['output'] = json.dumps(string_tuple_list).encode('base64','strict')
                 hive_result_data['message'] = "query executed successfully"
 
             elif hive_result['status'] == 1 or hive_result['status'] == 7:
-                my_logger.info(hive_result)
-                my_logger.info(type(hive_result))
+                print hive_result, type(hive_result), "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"
                 query_status = TblHiveQueryStatus(uid_hive_request_id=hive_request_id,
                                                   var_query_status=status_dict[hive_result],
                                                   ts_status_datetime=datetime.now(),
@@ -78,18 +76,8 @@ def hiveResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,
 
         url = server_url + 'hivequeryoutput'
         data = json.dumps(hive_result_data)
-        my_logger.info(data)
+        print data
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=data, headers=headers)
-        my_logger.info('done')
+        print 'done'
 
-    except Exception as e:
-
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-
-        my_logger.error(exc_type)
-        my_logger.error(fname)
-        my_logger.error(exc_tb.tb_lineno)
-    finally:
-        db_session.close()

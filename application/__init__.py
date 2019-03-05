@@ -59,11 +59,11 @@ def site_map():
     print (links)
 
 
-#agentregisterfunc()
-#agentdaemonscheduler()
-#supervisorcheduler()
-#agentmonitorscheduler()
-#hiveQueryConsumerScheduler()
+agentregisterfunc()
+agentdaemonscheduler()
+supervisorcheduler()
+agentmonitorscheduler()
+hiveQueryConsumerScheduler()
 jobstatusscheduler()
 jobinsertionscheduler()
 jobdiagnosticsscheduler()
