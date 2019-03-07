@@ -19,11 +19,11 @@ def kafkaMetricsProducer():
     data_req = json.loads(content, 'utf-8')
     customer_id = str(data_req['customer_id'])
     cluster_id = str(data_req['cluster_id'])
-    agent_id = str(data_req['agent_id'])
+    # agent_id = str(data_req['agent_id'])
+    role=str(data_req['role'])
     info.close()
-    while True:
-        try:
-
+    try:
+        if role=="namenode":
             my_logger.debug("Getting metrics and publishing....")
             producer = KafkaProducer(bootstrap_servers=[kafka_server_url])
             kafka_topic = "metrics_" + customer_id + "_" + cluster_id
@@ -33,34 +33,28 @@ def kafkaMetricsProducer():
             ram_metrics = ramMetrics()
             print "getting cpu metrics"
             cpu_metrics = cpuMetrics()
-            print "getting network metrics"
-            network_metrics = network()
             print "getting storage metrics"
             storage_metrics = storage()
-            disk_metrics = disk()
-
             metrics_list = []
-            metrics_list.extend((ram_metrics, cpu_metrics, network_metrics, storage_metrics, disk_metrics))
+            metrics_list.extend((ram_metrics,storage_metrics,cpu_metrics))
             my_logger.debug(metrics_list)
             metrics_data = {}
             metrics_data['event_type'] = "metrics"
             date_time = datetime.datetime.now()
-
+            print metrics_list
             time_value = str(int(round(time.mktime(date_time.timetuple()))) * 1000)
-
             metrics_data['time'] = time_value
             metrics_data['customer_id'] = customer_id
             metrics_data['cluster_id'] = cluster_id
-            metrics_data['agent_id'] = agent_id
             metrics_data['payload'] = metrics_list
             producer.send(kafkatopic, str(metrics_data))
             producer.flush()
             print "metricss produced"
-        except Exception as e:
-            #my_logger.error("Some error caught", e.message)
-            return e
-        time.sleep(20)
-
+        else :
+             pass
+    except Exception as e:
+         #my_logger.error("Some error caught", e.message)
+         print e
 
 def kafkaMetricsProducerScheduler():
     scheduler = BackgroundScheduler()
