@@ -6,13 +6,13 @@ def cpuMetrics():
 	result = json.loads(response.text)
 	node_details = result['nodes']
 	key = node_details['node']
-	lis = []
+	avaialable_cpu = []
 	for val in key:
 		host_name = val["nodeHostName"]
 		metric_value = val["availableVirtualCores"]
-		dict = {}
-		dict["metric_name"]="cpu"
-       	dict["host_name"]=str(host_name)
-        dict["metric_value"]=metric_value
-        lis.append(dict)
-	return lis
+		cpu_data = {}
+		cpu_data["metric_name"]="cpu"
+		cpu_data["host_name"]=str(host_name)
+		cpu_data["metric_value"]=metric_value
+		avaialable_cpu.append(cpu_data)
+	return avaialable_cpu
