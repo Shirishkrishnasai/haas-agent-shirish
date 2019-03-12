@@ -18,6 +18,10 @@ engine = create_engine("sqlite:////opt/agent/haas")
 session_factory = sessionmaker(bind=engine)
 sqlite_string= "/opt/agent/haas"
 from application.modules.workers.filebrowser import webhdfs
+from application.modules.workers.hdfs_fsck_worker import hdfsFSCKworker
+from application.modules.workers.hdfs_count_worker import hdfsCountworker
+from application.modules.workers.hdfs_delete_worker import hdfsDeleteworker
+from application.modules.workers.hdfs_list_worker import hdfsListworker
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
 from application.modules.daemons.metrics_producer import kafkaMetricsProducerScheduler
@@ -59,15 +63,19 @@ def site_map():
     print (links)
 
 
-agentregisterfunc()
-agentdaemonscheduler()
-supervisorcheduler()
-agentmonitorscheduler()
-hiveQueryConsumerScheduler()
-jobstatusscheduler()
-jobinsertionscheduler()
-jobdiagnosticsscheduler()
-#print __name__,"Running..."
+# agentregisterfunc()
+# agentdaemonscheduler()
+# supervisorcheduler()
+# agentmonitorscheduler()
+# hiveQueryConsumerScheduler()
+# jobstatusscheduler()
+# jobinsertionscheduler()
+# jobdiagnosticsscheduler()
+# hdfsFSCKworker('hivy/','lol')
+# hdfsCountworker('hivy','lol')
+# hdfsDeleteworker('hivy/create.py','lol')
+# hdfsListworker('hivy/','822c6a86-44b8-11e9-b210-d663bd873d93')
+print __name__,"Running..."
 def runProcess():
     """ add More processs here to run parallelly"""
 #    jobinsertion_process=Process(target=jobinsertionscheduler)
