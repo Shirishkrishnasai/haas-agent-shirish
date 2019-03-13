@@ -3,7 +3,6 @@ import json,ast
 from datetime import datetime
 from application.configfile import hive_connection, server_url
 from application.common.loggerfile import my_logger
-from application.common.hive import HiveQuery
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 
