@@ -1,44 +1,38 @@
-import requests,os,sys
+import requests,sys,os
 import json
-from datetime import datetime
-from application.configfile import hive_connection, server_url
+from application.configfile import server_url
 from application.common.loggerfile import my_logger
-from application.common.hive import HiveQuery
-from sqlalchemy.orm import scoped_session
-from application import session_factory
-
 
 def hdfsListworker(path,request_id):
-    file_command_list = ['fsck','count','remove','tail','text','upload','download','mv']
-    directory_command_list = ['list','fsck','count','mkdir']
-    namenodeip = '192.168.100.182'
+    try:
+        file_command_list = ['fsck','count','remove','tail','text','upload','download','mv']
+        directory_command_list = ['list','fsck','count','mkdir']
+        response = requests.get(url="http://localhost:50070/webhdfs/v1/" + path + "?op=LISTSTATUS")
+        result = response.json()
+        result_list = []
+        output_dict = {}
+        for dicts in result['FileStatuses']['FileStatus']:
+            res_dict = {}
+            if dicts['type'] == str('FILE'):
+                res_dict[str(dicts['pathSuffix'])] = file_command_list
+                res_dict['type'] = str(dicts['type'])
+                result_list.append(res_dict)
+            if dicts['type'] == str('DIRECTORY'):
+                res_dict[str(dicts['pathSuffix'])] = directory_command_list
+                res_dict['type'] = str(dicts['type'])
+                result_list.append(res_dict)
+        output_dict['output'] = result_list
+        output_dict['request_id'] = request_id
+        url = server_url + 'api/upload'
+        headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
+        requests.post(url, data=json.dumps(output_dict), headers=headers)
 
-    response = requests.get(url="http://" + namenodeip + ":50070/webhdfs/v1/" + path + "?op=LISTSTATUS")
-    result = response.json()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 
-    # result = response.text
-    # result = json.loads(result)
-    print result
-    result_list = []
-    output_dict = {}
-
-    for dicts in result['FileStatuses']['FileStatus']:
-        res_dict = {}
-        print dicts
-        if dicts['type'] == str('FILE'):
-            print 'file'
-            res_dict[str(dicts['pathSuffix'])] = file_command_list
-            res_dict['type'] = str(dicts['type'])
-            result_list.append(res_dict)
-        if dicts['type'] == str('DIRECTORY'):
-            print 'directory'
-            res_dict[str(dicts['pathSuffix'])] = directory_command_list
-            res_dict['type'] = str(dicts['type'])
-            result_list.append(res_dict)
-    print result_list
-    output_dict['output'] = result_list
-    output_dict['request_id'] = request_id
-    print output_dict
-    url = server_url + 'api/upload'
-    headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
-    requests.post(url, data=json.dumps(output_dict), headers=headers)
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
+    finally:
+        my_logger.info('hdfsListworker finally block')
