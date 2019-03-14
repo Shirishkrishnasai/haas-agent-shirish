@@ -22,6 +22,9 @@ from application.modules.workers.hdfs_fsck_worker import hdfsFSCKworker
 from application.modules.workers.hdfs_count_worker import hdfsCountworker
 from application.modules.workers.hdfs_delete_worker import hdfsDeleteworker
 from application.modules.workers.hdfs_list_worker import hdfsListworker
+from application.modules.workers.hdfs_move_worker import hdfsMoveworker
+from application.modules.workers.hdfs_text_worker import hdfsTextworker
+from application.modules.workers.hdfs_tail_worker import hdfsTailworker
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
 from application.modules.daemons.metrics_producer import kafkaMetricsProducerScheduler
@@ -75,7 +78,13 @@ def site_map():
 # hdfsCountworker('hivy','lol')
 # hdfsDeleteworker('hivy/create.py','lol')
 # hdfsListworker('hivy/','822c6a86-44b8-11e9-b210-d663bd873d93')
+# hdfsMoveworker('hivy/create.py','/sri','lol')
+# hdfsTailworker('/sri/pos_file')
+hdfsTextworker('hivy/pos_file','lol')
+
+hdfsTextworker()
 print __name__,"Running..."
+
 def runProcess():
     """ add More processs here to run parallelly"""
 #    jobinsertion_process=Process(target=jobinsertionscheduler)
