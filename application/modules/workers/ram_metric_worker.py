@@ -16,5 +16,5 @@ def ramMetrics():
         ram_data["metric_value"]=metric_value
         ram_data["base_value"]="0"
         ram_data["measured_in"]="bytes"
-        avialable_ram.append(dict)
+        avialable_ram.append(ram_data)
     return avialable_ram
