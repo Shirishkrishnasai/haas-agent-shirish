@@ -1,3 +1,8 @@
+'''
+Author - shirish
+modified - 19-03-2019
+'''
+
 import requests,sys,os
 import json
 from application.configfile import server_url
@@ -9,20 +14,38 @@ def hdfsListworker(path,request_id):
         directory_command_list = ['list','fsck','count','mkdir']
         response = requests.get(url="http://localhost:50070/webhdfs/v1/" + path + "?op=LISTSTATUS")
         result = response.json()
+        print result,'resssssssssssss'
         result_list = []
         output_dict = {}
         for dicts in result['FileStatuses']['FileStatus']:
             res_dict = {}
             if dicts['type'] == str('FILE'):
-                res_dict[str(dicts['pathSuffix'])] = file_command_list
+                res_dict['file_name'] = str(dicts['pathSuffix'])
+                res_dict['options'] = file_command_list
                 res_dict['type'] = str(dicts['type'])
+                res_dict['group'] = str(dicts['group'])
+                res_dict['permission'] = str(dicts['permission'])
+                res_dict['block_size'] = str(dicts['blockSize'])
+                res_dict['replication'] = str(dicts['replication'])
+                res_dict['length'] = str(dicts['length'])
+                res_dict['owner'] = str(dicts['owner'])
+
                 result_list.append(res_dict)
             if dicts['type'] == str('DIRECTORY'):
-                res_dict[str(dicts['pathSuffix'])] = directory_command_list
+                res_dict['directory_name'] = str(dicts['pathSuffix'])
+                res_dict['options'] = directory_command_list
                 res_dict['type'] = str(dicts['type'])
+                res_dict['group'] = str(dicts['group'])
+                res_dict['permission'] = str(dicts['permission'])
+                res_dict['block_size'] = str(dicts['blockSize'])
+                res_dict['replication'] = str(dicts['replication'])
+                res_dict['length'] = str(dicts['length'])
+                res_dict['owner'] = str(dicts['owner'])
+
                 result_list.append(res_dict)
         output_dict['output'] = result_list
         output_dict['request_id'] = request_id
+        print output_dict
         url = server_url + 'api/upload'
         headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=json.dumps(output_dict), headers=headers)
@@ -36,3 +59,5 @@ def hdfsListworker(path,request_id):
         my_logger.error(exc_tb.tb_lineno)
     finally:
         my_logger.info('hdfsListworker finally block')
+
+

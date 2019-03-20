@@ -1,3 +1,8 @@
+'''
+Author - shirish
+modified - 19-03-2019
+'''
+
 import requests,sys,os
 import json
 from application.configfile import server_url
@@ -27,14 +32,13 @@ def hdfsMkdirworker(path, dirname):
             if message == True:
                 url = server_url + 'api/upload'
                 headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
-                output_dict = {"message": "sucess"}
+                output_dict = {"message": "success"}
                 requests.post(url, data=json.dumps(output_dict), headers=headers)
             else:
                 url = server_url + 'api/upload'
                 headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
                 output_dict = {"message": "failed"}
                 requests.post(url, data=json.dumps(output_dict), headers=headers)
-                return jsonify(message="failed")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
