@@ -9,14 +9,18 @@ import requests,sys,os
 import json
 from application.common.loggerfile import my_logger
 
-def hdfsTailworker(path,request_id):
+def hdfsHeadworker(path,request_id):
     try:
+        print path
         # change the static path
-        args="/haas-agent/application/modules/workers/hdfs.sh %s" %path
+        args="/haas-agent/application/modules/workers/hdfs_head.sh %s" %path
+        print args,'argsssssssss'
         out_put = subprocess.check_output(args, shell = True)
+        print out_put,type(out_put) ,'lolllllllllll'
         url = server_url + 'api/upload'
         headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=json.dumps(out_put), headers=headers)
+
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -26,5 +30,3 @@ def hdfsTailworker(path,request_id):
 
     finally:
         my_logger.info('hdfsTailworker finally block')
-
-

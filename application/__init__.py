@@ -25,6 +25,11 @@ from application.modules.workers.hdfs_list_worker import hdfsListworker
 from application.modules.workers.hdfs_move_worker import hdfsMoveworker
 from application.modules.workers.hdfs_text_worker import hdfsTextworker
 from application.modules.workers.hdfs_tail_worker import hdfsTailworker
+from application.modules.workers.hdfs_head_worker import hdfsHeadworker
+from application.modules.workers.hdfs_file_upload_worker import hdfsFileuploadworker
+from application.modules.workers.hdfs_file_download_worker import hdfsFiledownloadworker
+from application.modules.workers.hdfs_mkdir_worker import hdfsMkdirworker
+
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
 from application.modules.daemons.metrics_producer import kafkaMetricsProducerScheduler
@@ -74,15 +79,19 @@ def site_map():
 # jobstatusscheduler()
 # jobinsertionscheduler()
 # jobdiagnosticsscheduler()
+
 # hdfsFSCKworker('hivy/','lol')
 # hdfsCountworker('hivy','lol')
 # hdfsDeleteworker('hivy/create.py','lol')
 # hdfsListworker('hivy/','822c6a86-44b8-11e9-b210-d663bd873d93')
+# hdfsHeadworker('/hivy/pos_file','lol')
+# hdfsFileuploadworker('/home/hadoop/test1.py','/hivy/','lol')
+# hdfsFiledownloadworker('/hivy/test1.py','lol')
 # hdfsMoveworker('hivy/create.py','/sri','lol')
 # hdfsTailworker('/sri/pos_file')
-hdfsTextworker('hivy/pos_file','lol')
+# hdfsTextworker('/hivy/pos_file','pos_file',8)
+# hdfsMkdirworker('/','hivy')
 
-hdfsTextworker()
 print __name__,"Running..."
 
 def runProcess():

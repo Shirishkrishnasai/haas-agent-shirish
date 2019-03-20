@@ -30,7 +30,7 @@ target_file_name='sales_azure.csv'
 
 file_service = FileService(account_name=azure_account_name, account_key=azure_account_key)
 
-file_service.
+# file_service.
 
 filestatus_url = hdfs_api_host+rest_suffix+hdfs_file_path+file_status_operation
 print filestatus_url

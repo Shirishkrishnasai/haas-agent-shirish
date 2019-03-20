@@ -1,38 +1,46 @@
+'''
+Author - shirish
+modified - 19-03-2019
+'''
+
 import subprocess
 import requests,sys,os
 import json
-def hdfsTextworker(hdfs_file_path,request_id):
-    # print path
-    # args="/home/hadoop/hdfs.sh %s" %path
-    # print args
-    # out_put = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True)
-    # out, err = out_put.communicate()
-    # print out,err,'lollllll'
-    # response = requests.get(url="http://192.168.100.182:50070/webhdfs/v1/" + file_path + "?&op=OPEN")
-    # result = response.json()
-    # print result
-    chunk_size = 1024 * 1024 * 64
-    offset = 0
+from application.configfile import server_url
+from application.common.loggerfile import my_logger
 
-    # HDFS Information
-    #hdfs_file_directory = '/hivy/'
-    #hdfs_file = 'pos_file'
-    namenode = 'http://192.168.100.182'
+def hdfsTextworker(hdfs_file_path,request_id,number_of_lines):
+    try:
 
-    #hdfs_file_path = hdfs_file_directory + hdfs_file
-    hdfs_api_host = namenode + ':50070'
+        namenode = 'http://192.168.100.182'
 
-    rest_suffix = '/webhdfs/v1'
-    read_file_operation = '?user.name=hadoop&op=OPEN'
+        hdfs_api_host = namenode + ':50070'
+        rest_suffix = '/webhdfs/v1'
+        read_file_operation = '?op=OPEN'
 
-    # file_read_url = hdfs_api_host + rest_suffix + hdfs_file_path + read_file_operation + '&off_set=' + str(offset)\
-    #                 + '&length=' + str(chunk_size) + '&buffersize=' + str(chunk_size)
-    file_read_url = hdfs_api_host + rest_suffix + hdfs_file_path + read_file_operation + '&off_set=' + str(offset) \
-                    + '&length=' + str(chunk_size) + '&buffersize=' + str(chunk_size)
-    print file_read_url
-    str_content = requests.get(file_read_url).content
-    #result = str_content.json()
-    #print result
-    print str_content
-hdfsTextworker('/hivy/pos_file','lol')
+        file_read_url = hdfs_api_host + rest_suffix + hdfs_file_path + read_file_operation
+        print file_read_url
+        str_content = requests.get(file_read_url).content
+        cont = str_content.split('\n')
+        output_list = []
+        for con in cont[0:number_of_lines]:
+            output_tup = []
+            output_tup.append(con)
+            output_list.append(output_tup)
+        print output_list
+        output_dict = {}
+        output_dict['output'] = output_list
+        output_dict['request_id'] = request_id
+        print output_dict
+        url = server_url + 'api/upload'
+        headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
+        requests.post(url, data=json.dumps(output_dict), headers=headers)
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
+    finally:
+        my_logger.info('hdfsTextworker finally block')
 
