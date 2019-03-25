@@ -1,7 +1,7 @@
+from application.common.loggerfile import my_logger
 from pyhive import hive
 from TCLIService.ttypes import TOperationState
-import  logging
-import time
+import os,sys
 
 class HiveQuery:
 
@@ -19,37 +19,15 @@ class HiveQuery:
     def __run_query(self, query="", conn=None):
         try:
             if conn:
-                messages=[]
                 cursor = conn.cursor()
-                print "tilllll hereeeeeeeeeee doneeeeeeeee"
+                # print "tilllll hereeeeeeeeeee doneeeeeeeee"
                 cursor.execute(query, async=True)
 
-                print "this is not doneeeeeeeee what tooooooooooo dooooooooooo"
+                # print "this is not doneeeeeeeee what tooooooooooo dooooooooooo"
                 status = cursor.poll().operationState
-                print "the initial status",status
+                # print "the initial status",status
                 while status in (TOperationState.INITIALIZED_STATE, TOperationState.RUNNING_STATE):
-                    print "the status you wanted",status
-                    #logs = cursor.fetch_logs()
-                    #for message in logs:
-                     #   messages.append(message)
-                    #print "class messagessssssssssssssssssss",messages
-                    #time.sleep(2)
                     status = cursor.poll().operationState
-
-
-
-
-
-                print "now this is hive query status",status
-
-
-                if status==TOperationState.FINISHED_STATE:
-                    print 'result existsssssssssssssssssss'
-                else:
-                    print 'noooooooooo resulttttttttt setttttttttttt'
-
-
-
 
                 result_dict={}
                 result_dict['status'] = status
@@ -58,7 +36,11 @@ class HiveQuery:
                 return result_dict
 
         except Exception as e:
-            print e.message
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            my_logger.error(exc_type)
+            my_logger.error(fname)
+            my_logger.error(exc_tb.tb_lineno)
             return e.__str__()
 
 
@@ -73,14 +55,7 @@ class HiveQuery:
                 cursor = conn.cursor()
                 cursor.execute(query, async=True)
                 status = cursor.poll().operationState
-                print "the initial status",status
                 while status in (TOperationState.INITIALIZED_STATE, TOperationState.RUNNING_STATE):
-                    #print "the status you wanted",status
-                    #logs = cursor.fetch_logs()
-                    #for message in logs:
-                     #   messages.append(message)
-                    #print "class messagessssssssssssssssssss",messages
-                    #time.sleep(2)
                     status = cursor.poll().operationState
                 return status
         except Exception as e:

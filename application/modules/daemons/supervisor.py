@@ -11,7 +11,6 @@ from application.common.load_config import loadconfig
 from application.common.loggerfile import my_logger
 from application.configfile import kafka_server_url
 from application.models.models import TblAgentTaskStatus,TblAgentWorkerTaskMapping
-# from confluent_kafka import Consumer
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy.orm import scoped_session
 
@@ -20,15 +19,11 @@ def _supervisoragent():
     try :
         db_session=scoped_session(session_factory)
         my_logger.info('in supervisor')
-        print "in gent supervisor"
         agent_id, customer_id, cluster_id = loadconfig()
-        print "agent info file information", agent_id, customer_id, cluster_id
         taskupdate= db_session.query(TblAgentWorkerTaskMapping.uid_task_id,TblAgentWorkerTaskMapping.txt_path,
                                      TblAgentWorkerTaskMapping.txt_payload_id).filter(TblAgentWorkerTaskMapping.var_task_status=="INITIALISED").all()
-        print taskupdate,type(taskupdate)
         tasks_data=[]
         for task in taskupdate:
-            print task
             tasks_dat={}
             tasks_dat['taskid']=str(task[0])
             tasks_dat['worker_path']=str(task[1])

@@ -1,5 +1,4 @@
-from kafka import KafkaConsumer
-from application.configfile import kafka_bootstrap_server
+import os,sys
 from sqlalchemy.orm import scoped_session
 from application import session_factory
 from application.models.models import TblMrJobInfo
@@ -9,10 +8,8 @@ from application.configfile import server_url,agentinfo_path
 import requests
 from application.common.loggerfile import my_logger
 import json
-import sys,os
 def insertjob():
-#    try:
-        print "in"
+   try:
         session = scoped_session(session_factory)
         agent_data = open(agentinfo_path, "r")
         content = agent_data.read()
@@ -23,10 +20,8 @@ def insertjob():
                 pass
         else:
                 url = server_url + 'api/mrjob'
-
                 r = requests.get(url)
                 req_data = r.json()
-                print req_data
                 for data in req_data['message']:
                         insert_mr_job_info=TblMrJobInfo(var_resourcemanager_ip=data['resourcemanager_ip'],
                                             uid_request_id=data['request_id'],
@@ -39,19 +34,15 @@ def insertjob():
                                             var_job_diagnostic_status='CREATED')
                         session.add(insert_mr_job_info)
                         session.commit()
-                        print "out "
                         mrjobworker(data['request_id'])
-                        print "worker finished"
-
-
- #   except Exception as e:
-   #         exc_type, exc_obj, exc_tb = sys.exc_info()
-    #        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-     #       my_logger.error(exc_type)
-      #      my_logger.error(fname)
-       #     my_logger.error(exc_tb.tb_lineno)
-  #  finally:
-         		session.close()
+   except Exception as e:
+           exc_type, exc_obj, exc_tb = sys.exc_info()
+           fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+           my_logger.error(exc_type)
+           my_logger.error(fname)
+           my_logger.error(exc_tb.tb_lineno)
+   finally:
+        session.close()
 
 
 def jobinsertionscheduler():

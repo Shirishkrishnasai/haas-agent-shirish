@@ -25,5 +25,4 @@ def storage():
               store["metric_name"]="storage"
               store["measured_in"]="bytes"
               available_storage.append(store)
-    # print available_storage
     return available_storage

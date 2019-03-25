@@ -1,6 +1,4 @@
-import datetime
 import time
-import requests
 import json
 from kafka import KafkaProducer
 import logging
@@ -26,13 +24,8 @@ def hiveQueryStatus():
             customer_id = str(data_req['customer_id'])
             cluster_id = str(data_req['cluster_id'])
             agent_id = str(data_req['agent_id'])
-
-
-
             kafka_topic = "hivequerystatus_" + customer_id + "_" + cluster_id
-            my_logger.debug(kafka_topic)
             kafkatopic = kafka_topic.decode('utf-8')
-            my_logger.debug(kafkatopic)
             query_status_data = {}
             query_status_data['event_type'] = "query_status"
 
@@ -47,38 +40,24 @@ def hiveQueryStatus():
                 query_status_data['hive_request_id'] = str(each_row[0])
                 query_status_data['hive_query_status'] = str(each_row[1])
                 query_status_data['status_time'] = str(each_row[2])
-
-
-
-
-                my_logger.debug("print all the data that has to be given from kafka hiveeeee query status producer")
-                my_logger.debug(query_status_data)
-
                 producer.send(kafkatopic, str(query_status_data))
                 producer.flush()
-                my_logger.debug("doneeeeeeee-doneeeeeeeeeeee-londonnnnnnnnnnnnn")
-                my_logger.debug("done for agent side hive query status producer to send data through kafka pipeline")
-
                 update_querystatus_flag = db_session.query(TblHiveQueryStatus).filter(
                     TblHiveQueryStatus.uid_hive_request_id == each_row[0])
                 update_querystatus_flag.update({"bool_flag": 1})
                 db_session.commit()
                 db_session.close()
-
-                my_logger.debug("everything doneeeeeeeeeeeeeeeeeeeeeeeeeee")
-
             producer.close()
         except sqlite3.Error as er:
             my_logger.debug(er)
             my_logger.debug(sys.exc_info()[0])
-            #return 'sqlite error'
         except Exception as e:
-            print  "Some this went wrong", sys.exc_info()[0]
-            my_logger.debug(e)
-            my_logger.debug(sys.exc_info()[0])
-            #return e.message
-        #producer.close()
-        time.sleep(20)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            my_logger.error(exc_type)
+            my_logger.error(fname)
+            my_logger.error(exc_tb.tb_lineno)
+    time.sleep(20)
 
 
 def hiveStatusScheduler():
