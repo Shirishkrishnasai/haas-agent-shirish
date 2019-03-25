@@ -2,9 +2,8 @@ from sqlalchemy.orm import scoped_session
 from application import session_factory
 from apscheduler.schedulers.background import BackgroundScheduler
 from application.models.models import TblMrJobInfo
-import subprocess
 from application.configfile import server_url
-import json, requests
+import requests
 import sys,os,json
 from application.common.loggerfile import my_logger
 
@@ -25,10 +24,7 @@ def jobstatus():
             replaceappid=job_details[1].replace(str(appnumber[-1]),str(applicationid))
             jobstatus_statement="http://"+job_details[5]+":8088/ws/v1/cluster/apps/" +replaceappid+"/state"
             token=requests.get(jobstatus_statement)
-            print token
-            print type(token)
             jobstatus_dict=token.json()
-            print jobstatus_dict
             application_data = {"customer_id":job_details[3],"status": jobstatus_dict["state"], "request_id": job_details[0], "application_id": job_details[1]}
             job_list.append(application_data)
             update_jobinfo_query = session.query(TblMrJobInfo).filter(TblMrJobInfo.uid_request_id==job_details[0],TblMrJobInfo.var_application_id==job_details[1])

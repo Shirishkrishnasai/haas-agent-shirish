@@ -15,18 +15,13 @@ def hdfsBrowserDaemon():
         content = agent_info.read()
         data_req = json.loads(content, 'utf-8')
         agent_id = str(data_req['agent_id'])
-
         role = str(data_req['role'])
         if role == 'namenode':
-
             url = server_url + "hdfs/" + agent_id
             headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
             api_response = requests.get(url, headers=headers).json()
             path = api_response['job_parameters']
-            print json.dumps(api_response)
-            print 'done'
             if api_response == 000:
-                print "no messages for now"
                 pass
             else:
                 for each_command in api_response:
@@ -84,7 +79,6 @@ def hdfsBrowserDaemon():
                         fsck_process.start()
                         fsck_process.join()
         else:
-            print "this node role is not namenode"
             pass
     except Exception as e:
 

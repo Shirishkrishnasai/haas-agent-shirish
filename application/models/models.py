@@ -1,6 +1,5 @@
-from sqlalchemy import BigInteger, Boolean, CHAR, Column, DateTime, ForeignKey, Integer, String, Table, Text, text, create_engine, inspect, Sequence
+from sqlalchemy import  Boolean, Column, DateTime,  Integer, String,  Text,  create_engine, inspect
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.dialects.postgresql import UUID
 
 db_url = 'sqlite:////opt/agent/haas'
 engine = create_engine(db_url)

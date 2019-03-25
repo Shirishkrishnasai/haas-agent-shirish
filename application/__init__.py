@@ -41,7 +41,7 @@ from application.modules.daemons.metrics_producer import kafkaMetricsProducerSch
 from application.modules.daemons.supervisor import supervisorcheduler
 from application.modules.daemons.hive_query_consumer import hiveQueryConsumerScheduler
 from application.modules.daemons.hive_status_producer import hiveStatusScheduler
-
+from application.modules.daemons.hive_work_status import hive_work_status_schduler
 from application.modules.daemons.hive_database_query_consumer import hiveDatabaseQueryConsumer
 from application.modules.daemons.job_diagnostics_producer import jobdiagnosticsscheduler
 from application.modules.daemons.job_status_producer import jobstatusscheduler
@@ -79,7 +79,7 @@ def site_map():
 # jobstatusscheduler()
 # jobinsertionscheduler()
 # jobdiagnosticsscheduler()
-
+hive_work_status_schduler()
 # hdfsFSCKworker('hivy/','lol')
 # hdfsCountworker('hivy','lol')
 # hdfsDeleteworker('hivy/create.py','lol')

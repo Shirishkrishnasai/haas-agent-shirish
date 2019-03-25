@@ -1,6 +1,5 @@
 import requests
-# from yarn_api_client import ApplicationMaster, HistoryServer, NodeManager, ResourceManager
-import json, time
+import json
 
 
 class HDFSManager():
@@ -12,15 +11,15 @@ class HDFSManager():
 
     def __makeGet(self, url="", data=None, json_data=None):
 
-        print "calling ", url
+        # print "calling ", url
         resp = requests.get(url, headers={"Content-type": "application/json"})
         data = json.loads(resp.content)
         return data
 
     def __makePost(self, url="", data=None, json_data=None, files=None):
-        print "calling ", url
+        # print "calling ", url
         resp = requests.put(url, files=files, headers={"Content-type": "application/json"})
-        print resp.reason
+        # print resp.reason
         if (resp.status_code >= 200 and resp.status_code < 300):
             if resp.content:
                 data = json.loads(resp.content)
@@ -100,18 +99,18 @@ class MapRedResourceManager():
         """
 
         api_endpoint = 'http://{}:{}{}/new-application'.format(self.address, self.port, self.__getAppUrl())
-        print api_endpoint,"api"
+        # print api_endpoint,"api"
 
         appid = requests.post(api_endpoint, None, None, headers=self.__getHeaders());
 
         new_app_response = json.loads(appid.content)
         application_id = new_app_response['application-id']
-	print new_app_response,"applicationcontent"
+	#print new_app_response,"applicationcontent"
         resources = {
             "memory": (1024 if not kwargs.get("memory") else kwargs.get("memory")),
             "vCores": (1 if not kwargs.get("vcores") else kwargs.get("vcores"))
         }
-        print resources,'resources'
+        # print resources,'resources'
         environment = {
             "entry":
                 [
@@ -152,11 +151,11 @@ class MapRedResourceManager():
             "application-type": "YARN",
             "keep-containers-across-application-attempts": 'true'
         }
-        print (mapRedJob)
+        # print (mapRedJob)
       #  time.sleep(10)
 
-        print self._submitJob(jobJson=mapRedJob),111
-	print  new_app_response['application-id']
+        # print self._submitJob(jobJson=mapRedJob),111
+	# print  new_app_response['application-id']
         return new_app_response['application-id']
 
     def prepareParams(self):
@@ -192,7 +191,7 @@ class MapRedResourceManager():
     """
 
     def __makePost(self, url="", data=None, json_data=None ,params=None):
-        print "calling ", url
+        # print "calling ", url
         resp = requests.post(url, data, json_data, headers={"Content-type": "application/json"})
         if (resp.status_code >= 200 and resp.status_code < 300):
             if resp.content:
@@ -204,7 +203,7 @@ class MapRedResourceManager():
                                                                                                 resp.content)}
 
     def __makeGet(self, url="", data=None, json_data=None):
-        print "calling ", url
+        # print "calling ", url
         resp = requests.get(url, headers={"Content-type": "application/json"})
         data = json.loads(resp.content)
         return data
