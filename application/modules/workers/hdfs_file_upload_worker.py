@@ -12,19 +12,19 @@ from application.common.loggerfile import my_logger
 def hdfsFileuploadworker(source_path,destination_path,request_id):
     try:
         #change the static path
-        args="/haas-agent/application/modules/workers/hdfs_file_upload.sh %s %s" %(source_path ,destination_path)
+        args="/opt/agent/application/modules/workers/hdfs_file_upload.sh %s %s" %(source_path ,destination_path)
         print args,'argsssssssss'
         out_put = subprocess.call(args, shell = True)
         print out_put
         if out_put == 0:
-            output =  {'output':'True'}
+	    output =  {'output':{'message':'file uploaded'},'request_id':request_id}
             print output
             url = server_url + 'api/upload'
             headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
             requests.post(url, data=json.dumps(output), headers=headers)
 
         else:
-            output =  {'output':'False'}
+	    output =  {'output':{'message':'file not uploaded'},'request_id':request_id}
             url = server_url + 'api/upload'
             headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
             requests.post(url, data=json.dumps(output), headers=headers)
