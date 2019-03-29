@@ -30,7 +30,7 @@ def mrjobworker(request_id):
 		mrjob_data["status"]='SUBMITTED'
 		url=server_url+"api/jobupdation"
 		headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
-		r = requests.post(url, data=json.dumps(mrjob_data), headers=headers)
+		requests.post(url, data=json.dumps(mrjob_data), headers=headers)
 	except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

@@ -14,7 +14,6 @@ def hdfsListworker(path,request_id):
         directory_command_list = ['list','fsck','count','mkdir']
         response = requests.get(url="http://localhost:50070/webhdfs/v1/" + path + "?op=LISTSTATUS")
         result = response.json()
-        print result,'resssssssssssss'
         result_list = []
         output_dict = {}
         for dicts in result['FileStatuses']['FileStatus']:
@@ -45,7 +44,6 @@ def hdfsListworker(path,request_id):
                 result_list.append(res_dict)
         output_dict['output'] = result_list
         output_dict['request_id'] = request_id
-        print output_dict
         url = server_url + 'api/upload'
         headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=json.dumps(output_dict), headers=headers)
@@ -57,7 +55,5 @@ def hdfsListworker(path,request_id):
         my_logger.error(exc_type)
         my_logger.error(fname)
         my_logger.error(exc_tb.tb_lineno)
-    finally:
-        my_logger.info('hdfsListworker finally block')
 
 

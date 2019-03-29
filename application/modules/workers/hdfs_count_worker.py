@@ -23,5 +23,3 @@ def hdfsCountworker(directory_path,request_id):
         my_logger.error(exc_type)
         my_logger.error(fname)
         my_logger.error(exc_tb.tb_lineno)
-    finally:
-        my_logger.info('hdfsCountworker finally block')

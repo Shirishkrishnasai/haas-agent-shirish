@@ -33,7 +33,6 @@ def submitJob(address='192.168.100.169',location="localhost", port=5000, jar_pat
             "memory": (1024 if not kwargs.get("memory") else kwargs.get("memory")),
             "vCores": (1 if not kwargs.get("vcores") else kwargs.get("vcores"))
         }
-        print resources
         environment = {
             "entry":
                 [

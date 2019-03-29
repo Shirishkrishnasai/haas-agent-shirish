@@ -15,7 +15,6 @@ def hdfsMoveworker(file_path,destination_path,request_id):
         key = result.keys()[0]
         result[str(key)] = result.pop(result.keys()[0])
         result['request_id'] = request_id
-        print result
         url = server_url + 'api/upload'
         headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=json.dumps(result), headers=headers)
@@ -25,5 +24,3 @@ def hdfsMoveworker(file_path,destination_path,request_id):
         my_logger.error(exc_type)
         my_logger.error(fname)
         my_logger.error(exc_tb.tb_lineno)
-    finally:
-        my_logger.info('hdfsMoveworker finally block')

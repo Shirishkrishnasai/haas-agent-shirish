@@ -1,4 +1,6 @@
 import requests, multiprocessing, json, sys, os
+import time
+
 from application.common.loggerfile import my_logger
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -13,7 +15,7 @@ from application.modules.workers.hdfs_tail_worker import hdfsTailworker
 from application.modules.workers.hdfs_move_worker import hdfsMoveworker
 from application.modules.workers.hdfs_file_upload_worker import hdfsFileuploadworker
 def hdfsBrowserDaemon():
-#    try:
+   try:
         agent_info = open(agentinfo_path, "r")
         content = agent_info.read()
         data_req = json.loads(content, 'utf-8')
@@ -21,14 +23,10 @@ def hdfsBrowserDaemon():
 
         role = str(data_req['role'])
         if role == 'namenode':
-
             url = server_url + "api/hdfs/request/"+agent_id
             headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
             api_response = requests.get(url, headers=headers).json()
-	#    api_response = json.loads(api_response_json)
- #           print json.dumps(api_response)
             if api_response == 000:
-                print "no messages for now"
                 pass
             else:
                 for each_command in api_response['message']:
@@ -51,7 +49,6 @@ def hdfsBrowserDaemon():
                         fsck_process.start()
                         fsck_process.join()
                     elif command == 'list':
-			            print "listing"
                         fsck_process = multiprocessing.Process(target=hdfsListworker,
                                                                args=([path, each_command['request_id']]))
                         fsck_process.start()
@@ -87,16 +84,14 @@ def hdfsBrowserDaemon():
                         fsck_process.start()
                         fsck_process.join()
         else:
-            print "this node role is not namenode"
             pass
-#    except Exception as e:
-
- #       exc_type, exc_obj, exc_tb = sys.exc_info()
-  #      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-   #     my_logger.error(exc_type)
-    #    my_logger.error(fname)
-     #   my_logger.error(exc_tb.tb_lineno)
-        #time.sleep(10)
+   except Exception as e:
+       exc_type, exc_obj, exc_tb = sys.exc_info()
+       fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+       my_logger.error(exc_type)
+       my_logger.error(fname)
+       my_logger.error(exc_tb.tb_lineno)
+       time.sleep(10)
 
 def hdfsBrowserDaemonScheduler():
     scheduler = BackgroundScheduler()
