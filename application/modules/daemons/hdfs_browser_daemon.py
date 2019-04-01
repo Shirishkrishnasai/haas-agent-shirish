@@ -1,7 +1,7 @@
 import requests, multiprocessing, json, sys, os
 from application.common.loggerfile import my_logger
 from apscheduler.schedulers.background import BackgroundScheduler
-
+import time
 from application.configfile import agentinfo_path, server_url
 from application.modules.workers.hdfs_count_worker import hdfsCountworker
 from application.modules.workers.hdfs_delete_worker import hdfsDeleteworker
@@ -12,8 +12,9 @@ from application.modules.workers.hdfs_head_worker import hdfsHeadworker
 from application.modules.workers.hdfs_tail_worker import hdfsTailworker
 from application.modules.workers.hdfs_move_worker import hdfsMoveworker
 from application.modules.workers.hdfs_file_upload_worker import hdfsFileuploadworker
+from application.modules.workers.hdfs_file_download_worker import hdfsFiledownloadworker
 def hdfsBrowserDaemon():
-#    try:
+    try:
         agent_info = open(agentinfo_path, "r")
         content = agent_info.read()
         data_req = json.loads(content, 'utf-8')
@@ -22,17 +23,17 @@ def hdfsBrowserDaemon():
         role = str(data_req['role'])
         if role == 'namenode':
 
-            url = server_url + "api/hdfs/request/"+agent_id
+            url = server_url + "api/hdfs/request/"+agent_id 
+	    print url,"urlllllllllllll"
             headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
             api_response = requests.get(url, headers=headers).json()
-	#    api_response = json.loads(api_response_json)
- #           print json.dumps(api_response)
+	    print api_response
             if api_response == 000:
                 print "no messages for now"
                 pass
             else:
                 for each_command in api_response['message']:
-                    path = each_command['hdfs_parameters']
+		    path = each_command['hdfs_parameters']
                     command = each_command['command_type']
                     if command == 'fsck':
                         fsck_process = multiprocessing.Process(target=hdfsFSCKworker,
@@ -51,7 +52,6 @@ def hdfsBrowserDaemon():
                         fsck_process.start()
                         fsck_process.join()
                     elif command == 'list':
-			            print "listing"
                         fsck_process = multiprocessing.Process(target=hdfsListworker,
                                                                args=([path, each_command['request_id']]))
                         fsck_process.start()
@@ -71,14 +71,14 @@ def hdfsBrowserDaemon():
                                                                 args=([each_command['input_path'],path, each_command['request_id']]))
                          fsck_process.start()
                          fsck_process.join()
-                    # elif command == 'download':
-                    #     fsck_process = multiprocessing.Process(target=fsckworker,
-                    #                                            args=([path, api_response['request_id']]))
-                    #     fsck_process.start()
-                    #     fsck_process.join()
+                    elif command == 'download':
+                         fsck_process = multiprocessing.Process(target=hdfsFiledownloadworker,
+                                                                args=([path, each_command['request_id']]))
+                         fsck_process.start()
+                         fsck_process.join()
                     elif command == 'mv':
                          fsck_process = multiprocessing.Process(target=hdfsMoveworker,
-                                                                args=([path, each_command['request_id']]))
+                                                                args=([path,each_command['output_path'] ,each_command['request_id']]))
                          fsck_process.start()
                          fsck_process.join()
                     elif command == 'remove':
@@ -89,18 +89,17 @@ def hdfsBrowserDaemon():
         else:
             print "this node role is not namenode"
             pass
-#    except Exception as e:
+    except Exception as e:
 
- #       exc_type, exc_obj, exc_tb = sys.exc_info()
-  #      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-   #     my_logger.error(exc_type)
-    #    my_logger.error(fname)
-     #   my_logger.error(exc_tb.tb_lineno)
-        #time.sleep(10)
-
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
+	time.sleep(10)
 def hdfsBrowserDaemonScheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(hdfsBrowserDaemon, 'cron', second='*/5')
+    scheduler.add_job(hdfsBrowserDaemon, 'cron', second='*/30')
     scheduler.start()
     pass
 

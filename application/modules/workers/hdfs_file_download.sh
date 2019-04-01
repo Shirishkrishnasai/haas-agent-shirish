@@ -1,3 +1,3 @@
 #!/bin/sh
-/opt/hadoop/bin/hdfs dfs -get $1  /home/hadoop/hivy/
+sudo /opt/hadoop/bin/hdfs dfs -get $1 /opt/mnt/azurefileshare/hdfs/$2
 
