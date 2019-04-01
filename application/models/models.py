@@ -53,6 +53,25 @@ class TblMrJobInfo(Base):
 	var_job_description = Column(String)
 	var_conf_folder_name = Column(String)
 
+class TblSparkJobInfo(Base):
+	__tablename__ = 'tbl_spark_job_info'
+
+	#srl_id = Column(Integer,primary_key=True)
+	uid_request_id = Column(String,primary_key=True)
+	uid_customer_id = Column(String(60))
+	uid_cluster_id = Column(String(60))
+	var_spark_job_status = Column(String(30))
+	uid_jar_upload_id = Column(String(60))
+	bool_job_status_produce = Column(Boolean)
+	var_spark_job_diagnostic_status = Column(String(20))
+	var_spark_job_parameters = Column(String)
+	var_file_name = Column(String)
+	var_resourcemanager_ip = Column(String(30))
+	var_spark_job_description = Column(String)
+	var_status = Column(String)
+	var_id = Column(String)
+	var_application_id = Column(String)
+
 class TblAgentWorkerTaskMapping(Base):
 	__tablename__='tbl_agent_worker_task_mapping'
 
@@ -72,6 +91,7 @@ class TblAgentWorkerTaskMapping(Base):
 	ts_created_datetime=Column(DateTime)
 	ts_modified_datetime=Column(DateTime)
 	var_task_status =Column(Integer)
+
 
 Base.metadata.create_all(bind=engine)
 ins = inspect(engine)

@@ -29,6 +29,10 @@ from application.modules.workers.hdfs_head_worker import hdfsHeadworker
 from application.modules.workers.hdfs_file_upload_worker import hdfsFileuploadworker
 from application.modules.workers.hdfs_file_download_worker import hdfsFiledownloadworker
 from application.modules.workers.hdfs_mkdir_worker import hdfsMkdirworker
+from application.modules.daemons.spark_job_consumer_daemon import sparkjobinsertionscheduler
+from application.modules.daemons.spark_job_status_daemon import sparkjobstatusscheduler
+from application.modules.daemons.spark_job_diagnostics_daemon import sparkjobdiagnosticscheduler
+
 
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
@@ -71,7 +75,7 @@ def site_map():
     print (links)
 
 
-# agentregisterfunc()
+agentregisterfunc()
 # agentdaemonscheduler()
 # supervisorcheduler()
 # agentmonitorscheduler()
@@ -91,7 +95,9 @@ hive_work_status_schduler()
 # hdfsTailworker('/sri/pos_file')
 # hdfsTextworker('/hivy/pos_file','pos_file',8)
 # hdfsMkdirworker('/','hivy')
-
+sparkjobinsertionscheduler()
+sparkjobstatusscheduler()
+sparkjobdiagnosticscheduler()
 print __name__,"Running..."
 
 def runProcess():
