@@ -9,21 +9,25 @@ from application import session_factory
 from application.models.models import TblHiveQueryStatus
 def hiveNoResultQueryWorker(query_database,hive_query,hive_request_id,customer_id,cluster_id):
 
+
+    status_dict = {
+    0: "INITIALIZED",
+    1: "RUNNING",
+    2: "FINISHED",
+    3: "CANCELED",
+    4: "CLOSED",
+    5: "ERROR",
+    6: "UNKNOWN",
+    7: "PENDING",
+    8: "TIMEDOUT",
+}
     try:
-        status_dict = {
-        0: "INITIALIZED",
-        1: "RUNNING",
-        2: "FINISHED",
-        3: "CANCELED",
-        4: "CLOSED",
-        5: "ERROR",
-        6: "UNKNOWN",
-        7: "PENDING",
-        8: "TIMEDOUT",
-        }
+        print "in hive no result query worker"
 
         hive_query_decode = hive_query.decode('base64', 'strict')
+
         hiveClient = HiveQuery(hive_connection, 10000, query_database)
+
         db_session = scoped_session(session_factory)
         hive_result_data = {}
         hive_result = hiveClient.runNoResultQuery(hive_query_decode)
@@ -37,6 +41,7 @@ def hiveNoResultQueryWorker(query_database,hive_query,hive_request_id,customer_i
             db_session.commit()
             hive_result_data['message'] = "query executed successfully"
         elif hive_result == 1 or hive_result == 7:
+            print hive_result, type(hive_result),"jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"
             query_status = TblHiveQueryStatus(uid_hive_request_id=hive_request_id,
                                                   var_query_status=status_dict[hive_result],
                                                   ts_status_datetime=datetime.now(),
@@ -59,13 +64,18 @@ def hiveNoResultQueryWorker(query_database,hive_query,hive_request_id,customer_i
 
         url = server_url + 'hivequeryoutput'
         data = json.dumps(hive_result_data)
+        print data
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=data, headers=headers)
+        print 'done'
+
+        print hive_result_data
+
     except Exception as e :
+
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+
         my_logger.error(exc_type)
         my_logger.error(fname)
         my_logger.error(exc_tb.tb_lineno)
-    finally:
-        db_session.close()

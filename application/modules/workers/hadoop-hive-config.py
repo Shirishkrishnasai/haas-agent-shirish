@@ -1,7 +1,6 @@
-from application.common.loggerfile import my_logger
 from bson.objectid import ObjectId
 import pymongo
-import sys,os
+import sys
 import subprocess
 from application.configfile import mongo_conn_string
 
@@ -10,24 +9,23 @@ object_id = payloadid[2]
 
 
 def worker_agent(objectid):
-    try:
-        myclient = pymongo.MongoClient(mongo_conn_string)
-        mydb = myclient["haas"]
-        querystatment = mydb.hiveconfig.find_one({"_id": ObjectId(objectid)})
-        ip = querystatment["namenode_ip"]
+    myclient = pymongo.MongoClient(mongo_conn_string)
+    mydb = myclient["haas"]
+    print(objectid)
 
-        path = "bash /opt/scripts/hive-hadoop-config.sh" + " " + str(ip)
+    querystatment = mydb.hiveconfig.find_one({"_id": ObjectId(objectid)})
+    print(querystatment["namenode_ip"])
+    ip = querystatment["namenode_ip"]
 
-        sh_path = []
-        sh_path.append(path)
-        execute = subprocess.call(sh_path, shell=True)
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        my_logger.error(exc_type)
-        my_logger.error(fname)
-        my_logger.error(exc_tb.tb_lineno)
+    path = "bash /opt/scripts/hive-hadoop-config.sh" + " " + str(ip)
 
+    sh_path = []
+    print(path)
+    sh_path.append(path)
+    print(sh_path)
+    execute = subprocess.call(sh_path, shell=True)
+
+    print(execute)
 
 
 worker_agent(objectid=object_id)
