@@ -8,17 +8,16 @@ import json
 from application.configfile import server_url
 from application.common.loggerfile import my_logger
 
-def hdfsMoveworker(file_path,destination_path,request_id):
+def hdfsRenameworker(file_path,destination_path,request_id):
     try:
-	file_name=file_path.split("/")
-        response = requests.put(url="http://localhost:50070/webhdfs/v1" + file_path + "?op=RENAME&destination="+destination_path+"/"+file_name[-1])
+        response = requests.put(url="http://localhost:50070/webhdfs/v1" + file_path + "?op=RENAME&destination="+destination_path)
         result = response.json()
-	print result
+        print result
         key = result.keys()[0]
         output_data={}
-        output_data['output'] = {"message":"moved successfully"}
+        output_data['output'] = {"message":"renamed successfully"}
         output_data['request_id'] = request_id
-	print output_data
+        print output_data
         url = server_url + 'api/upload'
         headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=json.dumps(output_data), headers=headers)

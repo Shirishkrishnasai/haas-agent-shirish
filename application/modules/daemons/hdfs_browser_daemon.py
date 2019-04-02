@@ -86,6 +86,12 @@ def hdfsBrowserDaemon():
                                                                args=([path, each_command['request_id']]))
                         fsck_process.start()
                         fsck_process.join()
+                    elif command == 'rename':
+                        fsck_process = multiprocessing.Process(target=hdfsDeleteworker,
+                                                               args=([path,each_command['output_path'] ,each_command['request_id']]))
+                        fsck_process.start()
+                        fsck_process.join()
+
         else:
             print "this node role is not namenode"
             pass
@@ -99,7 +105,7 @@ def hdfsBrowserDaemon():
 	time.sleep(10)
 def hdfsBrowserDaemonScheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(hdfsBrowserDaemon, 'cron', second='*/30')
+    scheduler.add_job(hdfsBrowserDaemon, 'cron', second='*/5')
     scheduler.start()
     pass
 
