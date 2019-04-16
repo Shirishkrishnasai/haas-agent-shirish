@@ -38,7 +38,7 @@ def spark_diagnostics():
                         data['request_id'] = str(diagnostics_data[0][0])
                         data['diagnostics'] = str(data1)
 
-                        url=server_url + "/sparkjobdiagnostics"
+                        url=server_url + "sparkjobdiagnostics"
                         out_data = json.dumps(data)
                         header = {'content-type': 'application/json', 'Accept': 'text/plain'}
                         s = requests.post(url, data=out_data, headers=header)

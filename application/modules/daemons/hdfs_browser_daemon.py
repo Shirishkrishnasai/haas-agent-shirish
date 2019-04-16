@@ -107,7 +107,6 @@ def hdfsBrowserDaemonScheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(hdfsBrowserDaemon, 'cron', second='*/5')
     scheduler.start()
-    pass
 
 
 

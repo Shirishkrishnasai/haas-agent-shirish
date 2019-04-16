@@ -154,7 +154,7 @@ class MapRedResourceManager():
         # print (mapRedJob)
       #  time.sleep(10)
 
-        # print self._submitJob(jobJson=mapRedJob),111
+        print self._submitJob(jobJson=mapRedJob),111
 	# print  new_app_response['application-id']
         return new_app_response['application-id']
 

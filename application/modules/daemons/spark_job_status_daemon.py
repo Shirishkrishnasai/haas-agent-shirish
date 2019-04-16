@@ -36,7 +36,7 @@ def spark_status_worker():
                     out_dict['request_id'] = req_id
                     out_dict['status'] = data['state']
                     out_dict['application_id'] = data['appId']
-                    url = server_url + "/sparkjobstatus"
+                    url = server_url + "sparkjobstatus"
                     data = json.dumps(out_dict)
                     header = {'content-type': 'application/json', 'Accept': 'text/plain'}
                     s = requests.post(url, data=data, headers=header)

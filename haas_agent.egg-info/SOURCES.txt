@@ -16,14 +16,18 @@ application/modules/daemons/__init__.py
 application/modules/daemons/ag_dm_registration.py
 application/modules/daemons/ag_dm_task_monitor.py
 application/modules/daemons/agent_daemon.py
+application/modules/daemons/hdfs_browser_daemon.py
 application/modules/daemons/hive_database_query_consumer.py
 application/modules/daemons/hive_query_consumer.py
 application/modules/daemons/hive_status_producer.py
+application/modules/daemons/hive_work_status.py
 application/modules/daemons/job_diagnostics_producer.py
 application/modules/daemons/job_insertion.py
-application/modules/daemons/job_status_consumer.py
 application/modules/daemons/job_status_producer.py
 application/modules/daemons/metrics_producer.py
+application/modules/daemons/spark_job_consumer_daemon.py
+application/modules/daemons/spark_job_diagnostics_daemon.py
+application/modules/daemons/spark_job_status_daemon.py
 application/modules/daemons/supervisor.py
 application/modules/registration/__init__.py
 application/modules/workers/__init__.py
@@ -33,6 +37,7 @@ application/modules/workers/cpu_metric_worker.py
 application/modules/workers/disk_metric_worker.py
 application/modules/workers/filebrowser.py
 application/modules/workers/hadoop-hive-config.py
+application/modules/workers/hadoop-spark-config.py
 application/modules/workers/hdfs_count_worker.py
 application/modules/workers/hdfs_delete_worker.py
 application/modules/workers/hdfs_file_download_worker.py
@@ -42,6 +47,7 @@ application/modules/workers/hdfs_head_worker.py
 application/modules/workers/hdfs_list_worker.py
 application/modules/workers/hdfs_mkdir_worker.py
 application/modules/workers/hdfs_move_worker.py
+application/modules/workers/hdfs_rename_worker.py
 application/modules/workers/hdfs_tail_worker.py
 application/modules/workers/hdfs_text_worker.py
 application/modules/workers/hive_noresult_query_worker.py
@@ -53,6 +59,8 @@ application/modules/workers/mr_job_worker.py
 application/modules/workers/network_metric_worker.py
 application/modules/workers/ram_metric_worker.py
 application/modules/workers/slaves.py
+application/modules/workers/spark_job_worker.py
+application/modules/workers/sparkhostdns.py
 application/modules/workers/storage_metric_worker.py
 application/modules/workers/workerconfiguration.py
 application/scripts/__init__.py

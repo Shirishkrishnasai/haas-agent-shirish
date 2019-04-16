@@ -17,23 +17,11 @@ db = SQLAlchemy(app)
 engine = create_engine("sqlite:////opt/agent/haas")
 session_factory = sessionmaker(bind=engine)
 sqlite_string= "/opt/agent/haas"
-from application.modules.workers.filebrowser import webhdfs
-from application.modules.workers.hdfs_fsck_worker import hdfsFSCKworker
-from application.modules.workers.hdfs_count_worker import hdfsCountworker
-from application.modules.workers.hdfs_delete_worker import hdfsDeleteworker
-from application.modules.workers.hdfs_list_worker import hdfsListworker
-from application.modules.workers.hdfs_move_worker import hdfsMoveworker
-from application.modules.workers.hdfs_text_worker import hdfsTextworker
-from application.modules.workers.hdfs_tail_worker import hdfsTailworker
-from application.modules.workers.hdfs_head_worker import hdfsHeadworker
-from application.modules.workers.hdfs_file_upload_worker import hdfsFileuploadworker
-from application.modules.workers.hdfs_file_download_worker import hdfsFiledownloadworker
-from application.modules.workers.hdfs_mkdir_worker import hdfsMkdirworker
 from application.modules.daemons.spark_job_consumer_daemon import sparkjobinsertionscheduler
 from application.modules.daemons.spark_job_status_daemon import sparkjobstatusscheduler
 from application.modules.daemons.spark_job_diagnostics_daemon import sparkjobdiagnosticscheduler
 
-
+from application.modules.daemons.hive_work_status import hive_work_status_schduler
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
 from application.modules.daemons.metrics_producer import kafkaMetricsProducerScheduler
@@ -41,7 +29,6 @@ from application.modules.daemons.agent_daemon import agentdaemonscheduler
 from application.modules.daemons.ag_dm_registration import agentregisterfunc
 from application.modules.daemons.ag_dm_task_monitor import agentmonitorscheduler
 from application.modules.daemons.metrics_producer import kafkaMetricsProducerScheduler
-#from application.modules.daemons.hive_result_query_worker import hiveSelectQueryResult
 from application.modules.daemons.supervisor import supervisorcheduler
 from application.modules.daemons.hive_query_consumer import hiveQueryConsumerScheduler
 from application.modules.daemons.hive_status_producer import hiveStatusScheduler
@@ -51,11 +38,12 @@ from application.modules.daemons.job_diagnostics_producer import jobdiagnosticss
 from application.modules.daemons.job_status_producer import jobstatusscheduler
 from application.modules.daemons.job_insertion import jobinsertionscheduler
 from configfile import hive_connection
+from application.modules.daemons.hdfs_browser_daemon import hdfsBrowserDaemonScheduler
+
 hivyc = hive_connection
 from application.modules.daemons.job_diagnostics_producer import jobdiagnostics
 from application.modules.daemons.job_status_producer import jobstatus
 from application.modules.daemons.job_insertion import insertjob
-#from application.modules.workers.file_upload_to_hdfs import fileuploadhdfs
 from multiprocessing import Process
 
 def has_no_empty_params(rule):
@@ -74,30 +62,20 @@ def site_map():
     # links is now a list of url, endpoint tuples
     print (links)
 
-
+kafkaMetricsProducerScheduler()
 agentregisterfunc()
-# agentdaemonscheduler()
-# supervisorcheduler()
-# agentmonitorscheduler()
-# hiveQueryConsumerScheduler()
-# jobstatusscheduler()
-# jobinsertionscheduler()
-# jobdiagnosticsscheduler()
-hive_work_status_schduler()
-# hdfsFSCKworker('hivy/','lol')
-# hdfsCountworker('hivy','lol')
-# hdfsDeleteworker('hivy/create.py','lol')
-# hdfsListworker('hivy/','822c6a86-44b8-11e9-b210-d663bd873d93')
-# hdfsHeadworker('/hivy/pos_file','lol')
-# hdfsFileuploadworker('/home/hadoop/test1.py','/hivy/','lol')
-# hdfsFiledownloadworker('/hivy/test1.py','lol')
-# hdfsMoveworker('hivy/create.py','/sri','lol')
-# hdfsTailworker('/sri/pos_file')
-# hdfsTextworker('/hivy/pos_file','pos_file',8)
-# hdfsMkdirworker('/','hivy')
+agentdaemonscheduler()
+supervisorcheduler()
+agentmonitorscheduler()
+hiveQueryConsumerScheduler()
+jobstatusscheduler()
+jobinsertionscheduler()
+jobdiagnosticsscheduler()
 sparkjobinsertionscheduler()
 sparkjobstatusscheduler()
 sparkjobdiagnosticscheduler()
+hdfsBrowserDaemonScheduler()
+hive_work_status_schduler()
 print __name__,"Running..."
 
 def runProcess():
@@ -111,8 +89,8 @@ def runProcess():
 
     #filebrowsing_process=Process(target=webhdfs)
     #filebrowsing_process.start()`
-#    kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
-#    kafkaMetricsProducerScheduler_Process.start()
+    #kafkaMetricsProducerScheduler_Process=Process(target=kafkaMetricsProducerScheduler)
+    #kafkaMetricsProducerScheduler_Process.start()
     #supervisoragent_Process=Process(target=supervisorcheduler)
     #supervisoragent_Process.start()
     #agentmonitorscheduler_Process=Process(target=agentmonitorscheduler)

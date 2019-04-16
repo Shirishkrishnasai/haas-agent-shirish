@@ -13,7 +13,7 @@ class TblAgentTaskStatus(Base):
 	__tablename__ = 'tbl_agent_task_status'
 
 	srl_id = Column(Integer, primary_key=True)
-	uid_task_id = Column(String(40))
+	uid_task_id = Column(String(40), unique = True)
 	ts_execution_start_datetime = Column(DateTime)
 	var_task_status = Column(String(50))
 	txt_message = Column(Text)
@@ -76,7 +76,7 @@ class TblAgentWorkerTaskMapping(Base):
 	__tablename__='tbl_agent_worker_task_mapping'
 
 	srl_id=Column(Integer,primary_key=True)
-	uid_task_id=Column(String(50))
+	uid_task_id=Column(String(50), unique = True)
 	uid_agent_id=Column
 	txt_payload_id=Column(String(40))
 	lng_task_type_id=Column(String(40))

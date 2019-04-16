@@ -18,8 +18,8 @@ def kafkaMetricsProducer():
     cluster_id = str(data_req['cluster_id'])
     role=str(data_req['role'])
     info.close()
-    while True:
-        try:
+    #while True:
+    try:
             if role=="namenode":
                 my_logger.debug("Getting metrics and publishing....")
                 producer = KafkaProducer(bootstrap_servers=[kafka_server_url])
@@ -44,13 +44,13 @@ def kafkaMetricsProducer():
                 producer.flush()
             else :
                 pass
-        except Exception as e:
+    except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             my_logger.error(exc_type)
             my_logger.error(fname)
             my_logger.error(exc_tb.tb_lineno)
-        time.sleep(60)
+        #time.sleep(60)
 
 
 def kafkaMetricsProducerScheduler():

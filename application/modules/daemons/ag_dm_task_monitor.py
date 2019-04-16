@@ -4,83 +4,76 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 from application.common.load_config import loadconfig
 from sqlalchemy.orm import scoped_session
+
 logging.basicConfig()
-import sqlite3
-from application import sqlite_string, session_factory
-from application.configfile import agentinfo_path, server_url, hgmonitor_connection
+from application import session_factory
+from application.configfile import  server_url
 from application.common.loggerfile import my_logger
 from application.models.models import TblAgentTaskStatus
 import os, sys
 
+
 def agentmonitordaemon():
     # getting status of worker and  uppdating hat information to hg monitor
+    try:
+        taskstatus_db_session = scoped_session(session_factory)
+        agent_id, customer_id, cluster_id = loadconfig()
+        agent_task_statuses = taskstatus_db_session.query(TblAgentTaskStatus.uid_task_id,
+                                                          TblAgentTaskStatus.var_task_status).filter(
+            TblAgentTaskStatus.bool_flag == 0).all()
+        if agent_task_statuses !=[]:
 
-        try:
-            db_session = scoped_session(session_factory)
-            agent_id, customer_id, cluster_id = loadconfig()
-            print agent_id, customer_id, cluster_id
-            select_task_status = db_session.query(TblAgentTaskStatus.uid_task_id,
-                                                  TblAgentTaskStatus.var_task_status,
-                                                  TblAgentTaskStatus.bool_flag).filter(TblAgentTaskStatus.bool_flag==0).all()
-            print select_task_status, "......................in agent task monitor.py"
-            my_logger.info("agent task status daemon fetched tasks")
-            for each_task in select_task_status:
-                print each_task, ".............in agent task monitor.py"
-                my_logger.info("in for loop")
-                my_logger.info(each_task)
-                task_id=each_task[0]
-                task_data = {}
-                my_logger.info("checked for bool_flag=0 in db")
-                task_data['task_id'] = each_task[0]
-                task_data['status'] = each_task[1]
+            print(
+                "the following tasks are yet to be give to server ...........there you go ................................")
+            print(agent_task_statuses)
 
-                task_status_data = {}
-                task_status_data['customer_id'] = customer_id
-                task_status_data['cluster_id'] = cluster_id
-                task_status_data['agent_id'] = agent_id
-                payload_data = {}
-                payload_data['task_id'] = str(each_task[0])
-                payload_data['status'] = str(each_task[1])
-                task_status_data['payload'] = payload_data
-                print task_status_data, "..........................................................in agent task monitor.py"
-                url=server_url+hgmonitor_connection
-                print url, "now this api for status posting................."
+            for each_status_row in agent_task_statuses:
+                print("now in the for loop of task status ................this is the task")
+                print each_status_row
+                task_status_post_json = {}
+                task_status_post_json['status'] = each_status_row[1]
+                task_status_post_json['cluster_id'] = cluster_id
+                # post_url = server_url+hgmonitor_connection+each_status_row[0]
+                post_url = server_url + "servertaskstatus/" + str(each_status_row[0])
+                headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
+                response_output = requests.post(post_url, data=json.dumps(task_status_post_json), headers=headers)
+                response_json = response_output.json()
+                print("this is the response from server after posting")
+                print(
+                    "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                print response_json
+		
+                if response_json['message'] == 'success' and response_json['taskid'] == each_status_row[0] and response_json['return_status'] ==each_status_row[1]:
+		    status_to_update = taskstatus_db_session.query(TblAgentTaskStatus.var_task_status).filter(TblAgentTaskStatus.uid_task_id == response_json['taskid']).first()
+		    if str(status_to_update[0]) == response_json['return_status']:
+                    	update_task_flag_query = taskstatus_db_session.query(TblAgentTaskStatus).filter(
+                        TblAgentTaskStatus.uid_task_id == each_status_row[0])
+                    	update_task_flag_query.update({"bool_flag": 1})
+	            	taskstatus_db_session.commit()
+                    	taskstatus_db_session.close()
+                    	print("committingggggggggggggggg to agent task table done")
+		    else:
+			pass
+		else:
+			pass
+	
+        else:
+            print "no task statuses"
 
-                headers={'content-type':'application/json','Accept':'text/plain'}
-                value=requests.post(url,data=json.dumps(task_status_data),headers=headers)
-                status= value.json()
-                print status
-                message=status['message']
-                print message
-                taskid=status['taskid']
-                print task_id
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 
-                print "agent monitor daemon posted all the status to serverrrrrrrrr ..."
-                if message== "success" and taskid== task_id :
-                    print "in if"
-                    update_task_flag_query = db_session.query(TblAgentTaskStatus).filter(
-                                TblAgentTaskStatus.uid_task_id == each_task[0])
-                    update_task_flag_query.update({"bool_flag": 1})
-                    db_session.commit()
-                    print "boool_flag updated"
-                else :
-                    pass
-                print 'task update to hgmonitor successfull'
-
-
-        except sqlite3.Error as er:
-            my_logger.info(er)
-            my_logger.info(sys.exc_info()[0])
-        except Exception as e:
-            print  "Some this went wrong", sys.exc_info()[0]
-            my_logger.info(e)
-            my_logger.info(sys.exc_info()[0])
-        finally:
-            db_session.close()
+        my_logger.error(exc_type)
+        my_logger.error(fname)
+        my_logger.error(exc_tb.tb_lineno)
+    finally:
+        taskstatus_db_session.close()
 
 
 def agentmonitorscheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(agentmonitordaemon, 'cron', second='*/9')
+    scheduler.add_job(agentmonitordaemon, 'cron', second='*/5')
     scheduler.start()
+
 

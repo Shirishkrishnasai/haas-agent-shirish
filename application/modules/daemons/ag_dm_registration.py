@@ -20,7 +20,9 @@ def agentregisterfunc():
         requests.post(url, data=data, headers=headers)
         azure_credential_url = server_url + azure_credentials_url + customer_id
         get_azure_credetials = requests.get(azure_credential_url)
+	print get_azure_credetials
         dict_azure_credentials = get_azure_credetials.json()
+	print dict_azure_credentials
         azure_account_name = dict_azure_credentials['account_name']
         azure_account_key = dict_azure_credentials['key']
         azure_share_name = cluster_id

@@ -40,7 +40,7 @@ def insertjob():
                     session.add(insert_spark_job_info)
                     session.commit()
                     submit_process = multiprocessing.Process(target=spark_submit,
-                                                             args=(data['request_id']))
+                                                             args=([data['request_id']]))
                     submit_process.start()
                     submit_process.join()
 

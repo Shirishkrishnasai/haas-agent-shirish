@@ -1,15 +1,12 @@
 import datetime
-import json
 import multiprocessing
 import os
 import subprocess
 import sys
-import time
 
 from application import session_factory
 from application.common.load_config import loadconfig
 from application.common.loggerfile import my_logger
-from application.configfile import kafka_server_url
 from application.models.models import TblAgentTaskStatus,TblAgentWorkerTaskMapping
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy.orm import scoped_session
@@ -19,18 +16,25 @@ def _supervisoragent():
     try :
         db_session=scoped_session(session_factory)
         my_logger.info('in supervisor')
+        print "in gent supervisor"
         agent_id, customer_id, cluster_id = loadconfig()
+        print "agent info file information", agent_id, customer_id, cluster_id
         taskupdate= db_session.query(TblAgentWorkerTaskMapping.uid_task_id,TblAgentWorkerTaskMapping.txt_path,
                                      TblAgentWorkerTaskMapping.txt_payload_id).filter(TblAgentWorkerTaskMapping.var_task_status=="INITIALISED").all()
+        print taskupdate,type(taskupdate)
         tasks_data=[]
-        for task in taskupdate:
+	if taskupdate != []:
+          for task in taskupdate:
+            print task
             tasks_dat={}
             tasks_dat['taskid']=str(task[0])
             tasks_dat['worker_path']=str(task[1])
             tasks_dat['payload_id']=str(task[2])
             tasks_data.append(tasks_dat)
-        print tasks_data,"this is task data "
-        if tasks_data!=[]:
+	    print tasks_data
+	    task_update = db_session.query(TblAgentWorkerTaskMapping).filter(TblAgentWorkerTaskMapping.uid_task_id == str(task[0]))
+            task_update.update({"var_task_status": "RUNNING"})
+            db_session.commit()
             task_execution = multiprocessing.Process(target=runExecution,args=([tasks_data]))
             task_execution.start()
             task_execution.join()
@@ -61,31 +65,30 @@ def supervisoragent():
 
 
 def runExecution(tasks_data):
-    db_session = scoped_session(session_factory)
+
     try:
+        db_session = scoped_session(session_factory)
         my_logger.info("agent_id verification done.....and this is true agent")
         print "supervisor------------agent_id verification done.....and this is true agent"
         for tasks in tasks_data :
             task_id = str(tasks['taskid'])
-            print task_id
+            print task_id, "thisssssssssssssssssssss izzzzzzzzzzzzzzzzzzzzzzz theeeeeeeee tasssssssssskkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
             path = str(tasks['worker_path'])
             payloadid = str(tasks['payload_id'])
             starttime = datetime.datetime.now()
-            task_status_insert_data = TblAgentTaskStatus(var_task_status='RUNNING',
+	    task_exists_query = db_session.query(TblAgentTaskStatus).filter(TblAgentTaskStatus.uid_task_id==task_id).all()
+
+	    if len(task_exists_query) == 0: 
+            	task_status_insert_data = TblAgentTaskStatus(var_task_status='RUNNING',
                                                              ts_execution_start_datetime=starttime,
                                                              uid_task_id=task_id,
                                                              bool_flag=0
                                                              )
 
-            db_session.add(task_status_insert_data)
-            db_session.commit()
-            task_update = db_session.query(TblAgentWorkerTaskMapping).filter(TblAgentWorkerTaskMapping.uid_task_id== task_id)
-            task_update.update({"var_task_status": "RUNNING"})
-            db_session.commit()
-            print "added"
-            my_logger.info("running status is updated in task status and bool flag is set to false as this is new entry")
+            	db_session.add(task_status_insert_data)
+            	db_session.commit()
+            	my_logger.info("running status is updated in task status and bool flag is set to false as this is new entry")
             print "supervisor committed to database..........in supervisor.py"
-            db_session = scoped_session(session_factory)
             if payloadid == str(None):
 
                 my_logger.info("there is no payload id that is y this block is being executed now")
@@ -118,7 +121,6 @@ def runExecution(tasks_data):
                                                          "bool_flag": 0,
                                                          "ts_finished_datetime": endtime})
                         db_session.commit()
-                        my_logger.info("completed status inserted into database")
                         print "database commit done by supervisor"
                 # Assigning to worker if worker has arguments to be taken
 
@@ -169,5 +171,6 @@ def runExecution(tasks_data):
         db_session.close()
 def supervisorcheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(supervisoragent,'cron',second='*/7' )
+    scheduler.add_job(supervisoragent,'cron',second='*/20' )
     scheduler.start()
+

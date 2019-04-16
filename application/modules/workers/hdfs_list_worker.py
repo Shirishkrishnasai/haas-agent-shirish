@@ -23,7 +23,7 @@ def hdfsListworker(path,request_id):
             if dicts['type'] == str('FILE'):
                 res_dict['file_name'] = str(dicts['pathSuffix'])
                 res_dict['options'] = file_command_list
-                res_dict['type'] = str(dicts['type'])
+                res_dict['type'] = "File"
                 res_dict['group'] = str(dicts['group'])
                 res_dict['permission'] = str(dicts['permission'])
                 res_dict['block_size'] = str(dicts['blockSize'])
@@ -40,7 +40,7 @@ def hdfsListworker(path,request_id):
             if dicts['type'] == str('DIRECTORY'):
                 res_dict['directory_name'] = str(dicts['pathSuffix'])
                 res_dict['options'] = directory_command_list
-                res_dict['type'] = str(dicts['type'])
+                res_dict['type'] = "Directory"
                 res_dict['group'] = str(dicts['group'])
                 res_dict['permission'] = str(dicts['permission'])
                 res_dict['block_size'] = str(dicts['blockSize'])
