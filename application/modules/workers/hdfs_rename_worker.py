@@ -11,17 +11,11 @@ from application.common.loggerfile import my_logger
 
 def hdfsRenameworker(file_path,destination_path,request_id):
    try:
-        print file_path,destination_path
         filepath_list=file_path.split("/")
-        print "/".join(filepath_list[0:-1])+"/"+destination_path,"sssssssssssssssssss"
-        response = requests.put(url="http://localhost:50070/webhdfs/v1" + file_path + "?op=RENAME&destination="+"/".join(filepath_list[0:-1])+"/"+destination_path)
-        result = response.json()
-        print result
-        key = result.keys()[0]
+        requests.put(url="http://localhost:50070/webhdfs/v1" + file_path + "?op=RENAME&destination="+"/".join(filepath_list[0:-1])+"/"+destination_path)
         output_data={}
         output_data['output'] = {"message":"renamed successfully"}
         output_data['request_id'] = request_id
-        print output_data
         url = server_url + 'api/upload'
         headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=json.dumps(output_data), headers=headers)
