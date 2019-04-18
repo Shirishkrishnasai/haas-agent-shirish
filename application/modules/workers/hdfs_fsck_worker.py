@@ -21,8 +21,8 @@ def hdfsFSCKworker(directory_path,request_id):
         for keys,values in result.items():
 	    print keys,values,'workerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'
             res_dict['blockSize'] = str(values['blockSize'])
-            res_dict['accessTime'] = str(values['accessTime'])
-            res_dict['modificationTime'] = str(values['modificationTime'])
+            res_dict['accessTime'] = values['accessTime']
+            res_dict['modificationTime'] = values['modificationTime']
             res_dict['replication'] = str(values['replication'])
             res_dict['length'] = str(values['length'])
             res_dict['fileId'] = str(values['fileId'])
