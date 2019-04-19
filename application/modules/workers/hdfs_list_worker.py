@@ -12,7 +12,7 @@ def hdfsListworker(path,request_id):
     try:
         file_command_list = ['fsck','count','remove','tail','text','upload','download','mv']
         directory_command_list = ['list','fsck','count','mkdir']
-        response = requests.get(url="http://localahost:50070/webhdfs/v1/" + path + "?op=LISTSTATUS")
+        response = requests.get(url="http://192.168.100.210:50070/webhdfs/v1/" + path + "?op=LISTSTATUS")
         result = response.json()
         res_dict = {}
         output_dict={}
@@ -30,7 +30,6 @@ def hdfsListworker(path,request_id):
                 result_list.append(res_dict)
         else:
             for dicts in result['FileStatuses']['FileStatus']:
-                    res_dict = {}
                     if dicts['type'] == str('FILE'):
                         res_dict['file_name'] = str(dicts['pathSuffix'])
                         res_dict['options'] = file_command_list
@@ -50,7 +49,7 @@ def hdfsListworker(path,request_id):
                                 res_dict['previous_path']="/"+"/".join(path_list[0:-2])
                             else:
                                 res_dict['previous_path']="/"+"/".join(path_list[0:-2])+"/"
-                                result_list.append(res_dict)
+                        result_list.append(res_dict)
                     if dicts['type'] == str('DIRECTORY'):
                         res_dict['file_name'] = str(dicts['pathSuffix'])
                         res_dict['options'] = directory_command_list
@@ -62,6 +61,7 @@ def hdfsListworker(path,request_id):
                         res_dict['length'] = str(dicts['length'])
                         res_dict['owner'] = str(dicts['owner'])
                         res_dict['path'] = str("/"+path)
+                        res_dict['count']= str(dicts['childrenNum']) +'items'
                         if res_dict['path'] == "/":
                                 pass
                         else:
