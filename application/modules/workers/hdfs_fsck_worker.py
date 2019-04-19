@@ -10,7 +10,7 @@ from application.common.loggerfile import my_logger
 
 def hdfsFSCKworker(directory_path,request_id):
    try:
-		url="http://localhost:50070/webhdfs/v1/" + str(directory_path) + "?op=GETFILESTATUS"
+		url="http://localhost:50070/webhdfs/v1" + str(directory_path) + "?op=GETFILESTATUS"
 		response = requests.get(url)
 		result = response.json()
 		res_dict = {}

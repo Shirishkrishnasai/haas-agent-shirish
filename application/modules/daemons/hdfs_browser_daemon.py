@@ -9,6 +9,7 @@ from application.modules.workers.hdfs_fsck_worker import hdfsFSCKworker
 from application.modules.workers.hdfs_list_worker import hdfsListworker
 from application.modules.workers.hdfs_mkdir_worker import hdfsMkdirworker
 from application.modules.workers.hdfs_head_worker import hdfsHeadworker
+from application.modules.workers.hdfs_rename_worker import hdfsRenameworker
 from application.modules.workers.hdfs_tail_worker import hdfsTailworker
 from application.modules.workers.hdfs_move_worker import hdfsMoveworker
 from application.modules.workers.hdfs_file_upload_worker import hdfsFileuploadworker
@@ -87,7 +88,7 @@ def hdfsBrowserDaemon():
                         fsck_process.start()
                         fsck_process.join()
                     elif command == 'rename':
-                        fsck_process = multiprocessing.Process(target=hdfsDeleteworker,
+                        fsck_process = multiprocessing.Process(target=hdfsRenameworker,
                                                                args=([path,each_command['output_path'] ,each_command['request_id']]))
                         fsck_process.start()
                         fsck_process.join()
