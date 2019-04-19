@@ -12,18 +12,14 @@ from application.common.loggerfile import my_logger
 
 def hdfsFiledownloadworker(source_path,request_id):
     try:
-        # change the static path
-	filename=uuid.uuid1()
+    	filename=uuid.uuid1()
         args="/opt/agent/application/modules/workers/hdfs_file_download.sh %s %s" %(source_path,filename)
-        print args,'argsssssssss'
         out_put = subprocess.call(args, shell = True)
-        print out_put,'lol'
         if out_put == 0:
             output = {"output":{"message":str(filename)},"request_id":request_id}
 
             url = server_url + 'api/upload'
             headers = {'content-type': 'application/json', 'Accept': 'text/plain'}
-	    print output,type(output)
             requests.post(url, data=json.dumps(output), headers=headers)
 
         else:
