@@ -30,6 +30,8 @@ def hdfsListworker(path,request_id):
                 result_list.append(res_dict)
         else:
             for dicts in result['FileStatuses']['FileStatus']:
+                    print dicts,"fileeeeeeeeeeeeeeeeee"
+		    res_dict = {}
                     if dicts['type'] == str('FILE'):
                         res_dict['file_name'] = str(dicts['pathSuffix'])
                         res_dict['options'] = file_command_list
@@ -61,7 +63,7 @@ def hdfsListworker(path,request_id):
                         res_dict['length'] = str(dicts['length'])
                         res_dict['owner'] = str(dicts['owner'])
                         res_dict['path'] = str("/"+path)
-                        res_dict['count']= str(dicts['childrenNum']) +'items'
+			res_dict['count']= str(dicts['childrenNum']) +'items'
                         if res_dict['path'] == "/":
                                 pass
                         else:
