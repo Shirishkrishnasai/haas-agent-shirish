@@ -20,9 +20,7 @@ def agentregisterfunc():
         requests.post(url, data=data, headers=headers)
         azure_credential_url = server_url + azure_credentials_url + customer_id
         get_azure_credetials = requests.get(azure_credential_url)
-	print get_azure_credetials
         dict_azure_credentials = get_azure_credetials.json()
-	print dict_azure_credentials
         azure_account_name = dict_azure_credentials['account_name']
         azure_account_key = dict_azure_credentials['key']
         azure_share_name = cluster_id
@@ -34,6 +32,10 @@ def agentregisterfunc():
             script_arguments = azure_account_name + ' ' + azure_account_key + ' ' + azure_share_name
             execute_statement = "bash" + ' ' + script_path + '/' + script_name + ' ' + script_arguments
             os.system(execute_statement)
+            script="/host.sh"
+            command_execute="sh " +script_path+script
+            print command_execute
+            os.system(command_execute)
         else:
             pass
     except Exception as e:
